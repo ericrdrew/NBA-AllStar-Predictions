@@ -54,6 +54,70 @@
 <script src="libs/anchor-sections-1.1.0/anchor-sections.js"></script>
 
 
+<style type="text/css">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { color: #008000; } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { color: #008000; font-weight: bold; } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
 
 
 <link rel="stylesheet" href="style.css" type="text/css" />
@@ -74,7 +138,8 @@
 <li class="divider"></li>
 <li class="chapter" data-level="1" data-path="index.html"><a href="#nba-all-star-predictions"><i class="fa fa-check"></i><b>1</b> NBA All-Star Predictions</a>
 <ul>
-<li class="chapter" data-level="1.1" data-path="index.html"><a href="#test"><i class="fa fa-check"></i><b>1.1</b> test</a></li>
+<li class="chapter" data-level="1.1" data-path="index.html"><a href="#introduction"><i class="fa fa-check"></i><b>1.1</b> Introduction</a></li>
+<li class="chapter" data-level="1.2" data-path="index.html"><a href="#methodologydata-prep"><i class="fa fa-check"></i><b>1.2</b> Methodology/Data Prep</a></li>
 </ul></li>
 <li class="divider"></li>
 <li><a href="https://github.com/rstudio/bookdown" target="blank">Published with bookdown</a></li>
@@ -102,8 +167,112 @@
 </div>
 <div id="nba-all-star-predictions" class="section level1 hasAnchor" number="1">
 <h1><span class="header-section-number">Chapter 1</span> NBA All-Star Predictions<a href="#nba-all-star-predictions" class="anchor-section" aria-label="Anchor link to header"></a></h1>
-<div id="test" class="section level2 hasAnchor" number="1.1">
-<h2><span class="header-section-number">1.1</span> test<a href="#test" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<div id="introduction" class="section level2 hasAnchor" number="1.1">
+<h2><span class="header-section-number">1.1</span> Introduction<a href="#introduction" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p><strong>Objective</strong></p>
+<p>Utilize an Extreme Gradient Boosting model, hereafter referred to as “xgboost”, to predict the NBA All-Star roster for the 2022-23 season.</p>
+<p><strong>Background</strong></p>
+<p>Each season in February, 24 of the NBA’s top performing players are selected as All-Stars. 12 players represent each of the East and West Conferences with the following breakdown:</p>
+<ul>
+<li>Four guards (Point Guard, Shooting Guard)</li>
+<li>Six frontcourt players (Small Forward, Power Forward, Center)</li>
+<li>Two additional players regardless of position</li>
+</ul>
+<p>Starting lineups are selected by a combination of fan, current player, and media votes, while the reserve players are selected by the league’s 30 head coaches. Injured players will be replaced by a player selected by the league’s Commissioner, Adam Silver [1].</p>
+<p><strong>Data</strong></p>
+<p>The model will be built off of player’s “per game” statistics from the 2003-04 to 2021-22 seasons, accessed from the public sports database Basketball-Reference [2]. Player statistics from the current season, which is only ~30 games in at the time of writing, will be used as our test dataset. My goal is to update my predictions in January and again in February just before the rosters are announced, allowing me to assess my models predictive power in real-time. While the model will not change during this time period, new data will be available as players continue to complete more games in the coming months.</p>
+</div>
+<div id="methodologydata-prep" class="section level2 hasAnchor" number="1.2">
+<h2><span class="header-section-number">1.2</span> Methodology/Data Prep<a href="#methodologydata-prep" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>I will be utilizing a combination of common and advanced Python libraries to complete the project. The following code is living and may be adapted as the project continues.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> time</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> sklearn</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> seaborn <span class="im">as</span> sns</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> xgboost <span class="im">as</span> xgb</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> scipy.stats <span class="im">import</span> zscore</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.preprocessing <span class="im">import</span> OneHotEncoder, LabelEncoder</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.compose <span class="im">import</span> make_column_transformer</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.model_selection <span class="im">import</span> GridSearchCV, KFold, RepeatedStratifiedKFold, train_test_split, cross_val_score, RandomizedSearchCV</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.metrics <span class="im">import</span> roc_curve, auc, roc_auc_score, RocCurveDisplay, plot_confusion_matrix</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.calibration <span class="im">import</span> calibration_curve</span></code></pre></div>
+<p>Now we will read in our 19 seasons of player per game statistics to build our training set on.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>s03 <span class="op">=</span> pd.read_csv(<span class="st">&#39;C:/Users/ericd/OneDrive - North Carolina State University/Desktop/NBA-AllStar-Predictions/Data/season03-04.csv&#39;</span>)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>s04 <span class="op">=</span> pd.read_csv(<span class="st">&#39;C:/Users/ericd/OneDrive - North Carolina State University/Desktop/NBA-AllStar-Predictions/Data/season04-05.csv&#39;</span>)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>s05 <span class="op">=</span> pd.read_csv(<span class="st">&#39;C:/Users/ericd/OneDrive - North Carolina State University/Desktop/NBA-AllStar-Predictions/Data/season05-06.csv&#39;</span>)</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>s06 <span class="op">=</span> pd.read_csv(<span class="st">&#39;C:/Users/ericd/OneDrive - North Carolina State University/Desktop/NBA-AllStar-Predictions/Data/season06-07.csv&#39;</span>)</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>s07 <span class="op">=</span> pd.read_csv(<span class="st">&#39;C:/Users/ericd/OneDrive - North Carolina State University/Desktop/NBA-AllStar-Predictions/Data/season07-08.csv&#39;</span>)</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>s08 <span class="op">=</span> pd.read_csv(<span class="st">&#39;C:/Users/ericd/OneDrive - North Carolina State University/Desktop/NBA-AllStar-Predictions/Data/season08-09.csv&#39;</span>)</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>s09 <span class="op">=</span> pd.read_csv(<span class="st">&#39;C:/Users/ericd/OneDrive - North Carolina State University/Desktop/NBA-AllStar-Predictions/Data/season09-10.csv&#39;</span>)</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>s10 <span class="op">=</span> pd.read_csv(<span class="st">&#39;C:/Users/ericd/OneDrive - North Carolina State University/Desktop/NBA-AllStar-Predictions/Data/season10-11.csv&#39;</span>)</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>s11 <span class="op">=</span> pd.read_csv(<span class="st">&#39;C:/Users/ericd/OneDrive - North Carolina State University/Desktop/NBA-AllStar-Predictions/Data/season11-12.csv&#39;</span>)</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>s12 <span class="op">=</span> pd.read_csv(<span class="st">&#39;C:/Users/ericd/OneDrive - North Carolina State University/Desktop/NBA-AllStar-Predictions/Data/season12-13.csv&#39;</span>)</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>s13 <span class="op">=</span> pd.read_csv(<span class="st">&#39;C:/Users/ericd/OneDrive - North Carolina State University/Desktop/NBA-AllStar-Predictions/Data/season13-14.csv&#39;</span>)</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>s14 <span class="op">=</span> pd.read_csv(<span class="st">&#39;C:/Users/ericd/OneDrive - North Carolina State University/Desktop/NBA-AllStar-Predictions/Data/season14-15.csv&#39;</span>)</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>s15 <span class="op">=</span> pd.read_csv(<span class="st">&#39;C:/Users/ericd/OneDrive - North Carolina State University/Desktop/NBA-AllStar-Predictions/Data/season15-16.csv&#39;</span>)</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>s16 <span class="op">=</span> pd.read_csv(<span class="st">&#39;C:/Users/ericd/OneDrive - North Carolina State University/Desktop/NBA-AllStar-Predictions/Data/season16-17.csv&#39;</span>)</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>s17 <span class="op">=</span> pd.read_csv(<span class="st">&#39;C:/Users/ericd/OneDrive - North Carolina State University/Desktop/NBA-AllStar-Predictions/Data/season17-18.csv&#39;</span>)</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>s18 <span class="op">=</span> pd.read_csv(<span class="st">&#39;C:/Users/ericd/OneDrive - North Carolina State University/Desktop/NBA-AllStar-Predictions/Data/season18-19.csv&#39;</span>)</span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>s19 <span class="op">=</span> pd.read_csv(<span class="st">&#39;C:/Users/ericd/OneDrive - North Carolina State University/Desktop/NBA-AllStar-Predictions/Data/season19-20.csv&#39;</span>)</span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>s20 <span class="op">=</span> pd.read_csv(<span class="st">&#39;C:/Users/ericd/OneDrive - North Carolina State University/Desktop/NBA-AllStar-Predictions/Data/season20-21.csv&#39;</span>)</span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>s21 <span class="op">=</span> pd.read_csv(<span class="st">&#39;C:/Users/ericd/OneDrive - North Carolina State University/Desktop/NBA-AllStar-Predictions/Data/season21-22.csv&#39;</span>)</span></code></pre></div>
+<p>There were a handful of things that needed to be done to the datasets before I could concatenate all 19 seasons into the cumulative training set.</p>
+<p><strong>Scaling by Season</strong></p>
+<p>The NBA is an incredibly dynamic league and has changed greatly over the last decades. For example, the average points scored by a team per game has fluctuated a good bit just in the time horizon we are concerned with in this project, with a high of 112.1 PPG in 2020-21 and low of 93.4 PPG in 2003-04, a difference of nearly 20 points per game [3]. Because of changes like these, it is difficult to compare raw statistics between players across seasons, especially those over a decade apart. For example, a player scoring 20 PPG in 2003 was likely more impactful than a 20 PPG scorer in 2020, and in the context of our project’s scope, may be the difference between an All-Star or not. The question of whether a player is an All-Star is likely not as simple as “how many points per game do they score?”, but “how does their scoring average compare to the rest of the league?”</p>
+<p>To combat this challenge, I scaled each season’s data individually using Z-scores, allowing us to measure how strong a player’s stat line was compared to the league <em>that season</em>. We then will be able to compare players across time by how much they stood out across a distribution, regardless of the season they played in.</p>
+<p>Examples of these calculations are shown below.</p>
+<pre><code>df[&#39;PTS&#39;] = zscore(df[&#39;PTS&#39;])
+df[&#39;Age&#39;] = zscore(df[&#39;Age&#39;])`
+df[&#39;PF&#39;] = zscore(df[&#39;PF&#39;])</code></pre>
+<p><strong>Observation Exclusion</strong></p>
+<p>In exploring the data, one challenge I discovered in the data was that for players who were traded or played for multiple seasons had more than one observation. These players had observations representing their stats while playing for each team during a season, as well as a cumulative season stat line, which was represented by their team being “TOT” for total. For the purposes of my model, I dropped the individual team stat line observations, and kept only the total season stats for a player.</p>
+<pre><code>df = df.sort_values([&#39;Player&#39;,&#39;G&#39;], ascending = [True, False])
+df = df.drop_duplicates(subset=[&#39;Player&#39;], keep=&#39;first&#39;)</code></pre>
+<p>Another concern was the data being too imbalanced for a model to find meaningful signal in. Most NBA seasons see over 450 individual players log minutes in at least one game. Left as this, the league would contain roughly ~5% All-Stars, crossing into rare-event territory. Seeing as players who rarely see the court are not going to be in contention for making the All-Star roster as is, I decided to subset our data to retain only players who played <em>at least</em> 15 minutes per 48 minute game. This was in an attempt to reduce the noise caused by an overwhelming amount of players who only enter games for a handful of minutes per game at best, who’s statistics would intuitively not bring any predictive power in separating All-Stars versus those who are not.</p>
+<pre><code>df = df[df[&#39;MP&#39;] &gt;= 15]</code></pre>
+<p>Lastly, there were some miscellaneous manipulations that needed to be made to the datasets, such dropping irrelevant variables such as an ID variable, and removing random special characters found in some observations.</p>
+<pre><code>df = df.drop([&#39;Rk&#39;,&#39;Player-additional&#39;,&#39;Tm&#39;], axis=1)
+df[&#39;Player&#39;] = df[&#39;Player&#39;].str.replace(&#39;\W&#39;, &#39;&#39;, regex=True)</code></pre>
+<p>To more efficiently apply these manipulations across all 19 datasets, I created a function to run them each through, as opposed to writing these commands for each one. The code for this, which is a culmination of the above commands, is shown below.</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co">#create list of dataframes to be used in loops(TRAIN ONLY)</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>dfList <span class="op">=</span> [s03,s04,s05,s06,s07,s08,s09,s10,s11,s12,s13,s14,s15,s16,s17,s18,s19,s20,s21]</span></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co">#cleaning function removing TOTs, keep to players &gt;=15MPG, scale continuous variables, remove special characters on name</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> trainPrep(df):</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>    df <span class="op">=</span> df.drop([<span class="st">&#39;Rk&#39;</span>,<span class="st">&#39;Player-additional&#39;</span>,<span class="st">&#39;Tm&#39;</span>], axis<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>    df <span class="op">=</span> df.sort_values([<span class="st">&#39;Player&#39;</span>,<span class="st">&#39;G&#39;</span>], ascending <span class="op">=</span> [<span class="va">True</span>, <span class="va">False</span>])</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>    df <span class="op">=</span> df.drop_duplicates(subset<span class="op">=</span>[<span class="st">&#39;Player&#39;</span>], keep<span class="op">=</span><span class="st">&#39;first&#39;</span>)</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>    df <span class="op">=</span> df[df[<span class="st">&#39;MP&#39;</span>] <span class="op">&gt;=</span> <span class="dv">15</span>]</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>    df[<span class="st">&#39;Age&#39;</span>] <span class="op">=</span> zscore(df[<span class="st">&#39;Age&#39;</span>])</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>    df[<span class="st">&#39;G&#39;</span>] <span class="op">=</span> zscore(df[<span class="st">&#39;G&#39;</span>])</span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>    df[<span class="st">&#39;GS&#39;</span>] <span class="op">=</span> zscore(df[<span class="st">&#39;GS&#39;</span>])</span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>    df[<span class="st">&#39;MP&#39;</span>] <span class="op">=</span> zscore(df[<span class="st">&#39;MP&#39;</span>])</span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>    df[<span class="st">&#39;FG&#39;</span>] <span class="op">=</span> zscore(df[<span class="st">&#39;FG&#39;</span>])</span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>    df[<span class="st">&#39;FGA&#39;</span>] <span class="op">=</span> zscore(df[<span class="st">&#39;FGA&#39;</span>])</span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>    df[<span class="st">&#39;FG%&#39;</span>] <span class="op">=</span> zscore(df[<span class="st">&#39;FG%&#39;</span>])</span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>    df[<span class="st">&#39;3P&#39;</span>] <span class="op">=</span> zscore(df[<span class="st">&#39;3P&#39;</span>])</span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>    df[<span class="st">&#39;3PA&#39;</span>] <span class="op">=</span> zscore(df[<span class="st">&#39;3PA&#39;</span>])</span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>    df[<span class="st">&#39;2P&#39;</span>] <span class="op">=</span> zscore(df[<span class="st">&#39;2P&#39;</span>])</span>
+<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a>    df[<span class="st">&#39;2PA&#39;</span>] <span class="op">=</span> zscore(df[<span class="st">&#39;2PA&#39;</span>])</span>
+<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a>    df[<span class="st">&#39;2P%&#39;</span>] <span class="op">=</span> zscore(df[<span class="st">&#39;2P%&#39;</span>])</span>
+<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a>    df[<span class="st">&#39;eFG%&#39;</span>] <span class="op">=</span> zscore(df[<span class="st">&#39;eFG%&#39;</span>])</span>
+<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a>    df[<span class="st">&#39;FT&#39;</span>] <span class="op">=</span> zscore(df[<span class="st">&#39;FT&#39;</span>])</span>
+<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a>    df[<span class="st">&#39;FTA&#39;</span>] <span class="op">=</span> zscore(df[<span class="st">&#39;FTA&#39;</span>])</span>
+<span id="cb8-22"><a href="#cb8-22" aria-hidden="true" tabindex="-1"></a>    df[<span class="st">&#39;FT%&#39;</span>] <span class="op">=</span> zscore(df[<span class="st">&#39;FT%&#39;</span>])</span>
+<span id="cb8-23"><a href="#cb8-23" aria-hidden="true" tabindex="-1"></a>    df[<span class="st">&#39;ORB&#39;</span>] <span class="op">=</span> zscore(df[<span class="st">&#39;ORB&#39;</span>])</span>
+<span id="cb8-24"><a href="#cb8-24" aria-hidden="true" tabindex="-1"></a>    df[<span class="st">&#39;DRB&#39;</span>] <span class="op">=</span> zscore(df[<span class="st">&#39;DRB&#39;</span>])</span>
+<span id="cb8-25"><a href="#cb8-25" aria-hidden="true" tabindex="-1"></a>    df[<span class="st">&#39;TRB&#39;</span>] <span class="op">=</span> zscore(df[<span class="st">&#39;TRB&#39;</span>])</span>
+<span id="cb8-26"><a href="#cb8-26" aria-hidden="true" tabindex="-1"></a>    df[<span class="st">&#39;AST&#39;</span>] <span class="op">=</span> zscore(df[<span class="st">&#39;AST&#39;</span>])</span>
+<span id="cb8-27"><a href="#cb8-27" aria-hidden="true" tabindex="-1"></a>    df[<span class="st">&#39;STL&#39;</span>] <span class="op">=</span> zscore(df[<span class="st">&#39;STL&#39;</span>])</span>
+<span id="cb8-28"><a href="#cb8-28" aria-hidden="true" tabindex="-1"></a>    df[<span class="st">&#39;BLK&#39;</span>] <span class="op">=</span> zscore(df[<span class="st">&#39;BLK&#39;</span>])</span>
+<span id="cb8-29"><a href="#cb8-29" aria-hidden="true" tabindex="-1"></a>    df[<span class="st">&#39;TOV&#39;</span>] <span class="op">=</span> zscore(df[<span class="st">&#39;TOV&#39;</span>])</span>
+<span id="cb8-30"><a href="#cb8-30" aria-hidden="true" tabindex="-1"></a>    df[<span class="st">&#39;PF&#39;</span>] <span class="op">=</span> zscore(df[<span class="st">&#39;PF&#39;</span>])</span>
+<span id="cb8-31"><a href="#cb8-31" aria-hidden="true" tabindex="-1"></a>    df[<span class="st">&#39;PTS&#39;</span>] <span class="op">=</span> zscore(df[<span class="st">&#39;PTS&#39;</span>])</span>
+<span id="cb8-32"><a href="#cb8-32" aria-hidden="true" tabindex="-1"></a>    df[<span class="st">&#39;Player&#39;</span>] <span class="op">=</span> df[<span class="st">&#39;Player&#39;</span>].<span class="bu">str</span>.replace(<span class="st">&#39;\W&#39;</span>, <span class="st">&#39;&#39;</span>, regex<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb8-33"><a href="#cb8-33" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> df</span></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Run training sets through cleaning function</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>s03,s04,s05,s06,s07,s08,s09,s10,s11,s12,s13,s14,s15,s16,s17,s18,s19,s20,s21 <span class="op">=</span>[trainPrep(df) <span class="cf">for</span> df <span class="kw">in</span> dfList]</span></code></pre></div>
 
 </div>
 </div>
