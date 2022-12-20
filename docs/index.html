@@ -23,7 +23,7 @@
 <meta name="author" content="Eric Drew" />
 
 
-<meta name="date" content="2022-12-19" />
+<meta name="date" content="2022-12-20" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -140,6 +140,9 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <ul>
 <li class="chapter" data-level="1.1" data-path="index.html"><a href="#introduction"><i class="fa fa-check"></i><b>1.1</b> Introduction</a></li>
 <li class="chapter" data-level="1.2" data-path="index.html"><a href="#methodologydata-prep"><i class="fa fa-check"></i><b>1.2</b> Methodology/Data Prep</a></li>
+<li class="chapter" data-level="1.3" data-path="index.html"><a href="#exploratory-data-analysis-eda"><i class="fa fa-check"></i><b>1.3</b> Exploratory Data Analysis (EDA)</a></li>
+<li class="chapter" data-level="1.4" data-path="index.html"><a href="#modeling"><i class="fa fa-check"></i><b>1.4</b> Modeling</a></li>
+<li class="chapter" data-level="1.5" data-path="index.html"><a href="#results"><i class="fa fa-check"></i><b>1.5</b> Results</a></li>
 </ul></li>
 <li class="divider"></li>
 <li><a href="https://github.com/rstudio/bookdown" target="blank">Published with bookdown</a></li>
@@ -163,7 +166,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div id="header">
 <h1 class="title">NBA All-Star Predictions</h1>
 <p class="author"><em>Eric Drew</em></p>
-<p class="date"><em>2022-12-19</em></p>
+<p class="date"><em>2022-12-20</em></p>
 </div>
 <div id="nba-all-star-predictions" class="section level1 hasAnchor" number="1">
 <h1><span class="header-section-number">1</span> NBA All-Star Predictions<a href="#nba-all-star-predictions" class="anchor-section" aria-label="Anchor link to header"></a></h1>
@@ -178,9 +181,9 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li>Six frontcourt players (Small Forward, Power Forward, Center)</li>
 <li>Two additional players regardless of position</li>
 </ul>
-<p>Starting lineups are selected by a combination of fan, current player, and media votes, while the reserve players are selected by the league’s 30 head coaches. Injured players will be replaced by a player selected by the league’s Commissioner, Adam Silver [1].</p>
+<p>Starting lineups are selected by a combination of fan, current player, and media votes, while the reserve players are selected by the league’s 30 head coaches. Injured players will be replaced by a player selected by the league’s Commissioner, Adam Silver.</p>
 <p><strong>Data</strong></p>
-<p>The model will be built off of player’s “per game” statistics from the 2003-04 to 2021-22 seasons, accessed from the public sports database Basketball-Reference [2]. Player statistics from the current season, which is only ~30 games in at the time of writing, will be used as our test dataset. My goal is to update my predictions in January and again in February just before the rosters are announced, allowing me to assess my models predictive power in real-time. While the model will not change during this time period, new data will be available as players continue to complete more games in the coming months.</p>
+<p>The model will be built off of player’s “per game” statistics from the 2003-04 to 2021-22 seasons, accessed from the public sports database Basketball-Reference. Player statistics from the current season, which is only ~30 games in at the time of writing, will be used as our test dataset. My goal is to update my predictions in January and again in February just before the rosters are announced, allowing me to assess my models predictive power in real-time. While the model will not change during this time period, new data will be available as players continue to complete more games in the coming months.</p>
 </div>
 <div id="methodologydata-prep" class="section level2 hasAnchor" number="1.2">
 <h2><span class="header-section-number">1.2</span> Methodology/Data Prep<a href="#methodologydata-prep" class="anchor-section" aria-label="Anchor link to header"></a></h2>
@@ -220,7 +223,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>s21 <span class="op">=</span> pd.read_csv(<span class="st">&#39;C:/Users/ericd/OneDrive - North Carolina State University/Desktop/NBA-AllStar-Predictions/Data/season21-22.csv&#39;</span>)</span></code></pre></div>
 <p>There were a handful of things that needed to be done to the datasets before I could concatenate all 19 seasons into the cumulative training set.</p>
 <p><strong>Scaling by Season</strong></p>
-<p>The NBA is an incredibly dynamic league and has changed greatly over the last decades. For example, the average points scored by a team per game has fluctuated a good bit just in the time horizon we are concerned with in this project, with a high of 112.1 PPG in 2020-21 and low of 93.4 PPG in 2003-04, a difference of nearly 20 points per game [3]. Because of changes like these, it is difficult to compare raw statistics between players across seasons, especially those over a decade apart. For example, a player scoring 20 PPG in 2003 was likely more impactful than a 20 PPG scorer in 2020, and in the context of our project’s scope, may be the difference between an All-Star or not. The question of whether a player is an All-Star is likely not as simple as “how many points per game do they score?”, but “how does their scoring average compare to the rest of the league?”</p>
+<p>The NBA is an incredibly dynamic league and has changed greatly over the last decades. For example, the average points scored by a team per game has fluctuated a good bit just in the time horizon we are concerned with in this project, with a high of 112.1 PPG in 2020-21 and low of 93.4 PPG in 2003-04, a difference of nearly 20 points per game. Because of changes like these, it is difficult to compare raw statistics between players across seasons, especially those over a decade apart. For example, a player scoring 20 PPG in 2003 was likely more impactful than a 20 PPG scorer in 2020, and in the context of our project’s scope, may be the difference between an All-Star or not. The question of whether a player is an All-Star is likely not as simple as “how many points per game do they score?”, but “how does their scoring average compare to the rest of the league?”</p>
 <p>To combat this challenge, I scaled each season’s data individually using Z-scores, allowing us to measure how strong a player’s stat line was compared to the league <em>that season</em>. We then will be able to compare players across time by how much they stood out across a distribution, regardless of the season they played in.</p>
 <p>Examples of these calculations are shown below.</p>
 <pre><code>df[&#39;PTS&#39;] = zscore(df[&#39;PTS&#39;])
@@ -230,7 +233,10 @@ df[&#39;PF&#39;] = zscore(df[&#39;PF&#39;])</code></pre>
 <p>In exploring the data, one challenge I discovered in the data was that for players who were traded or played for multiple seasons had more than one observation. These players had observations representing their stats while playing for each team during a season, as well as a cumulative season stat line, which was represented by their team being “TOT” for total. For the purposes of my model, I dropped the individual team stat line observations, and kept only the total season stats for a player.</p>
 <pre><code>df = df.sort_values([&#39;Player&#39;,&#39;G&#39;], ascending = [True, False])
 df = df.drop_duplicates(subset=[&#39;Player&#39;], keep=&#39;first&#39;)</code></pre>
-<p>Another concern was the data being too imbalanced for a model to find meaningful signal in. Most NBA seasons see over 450 individual players log minutes in at least one game. Left as this, the league would contain roughly ~5% All-Stars, crossing into rare-event territory. Seeing as players who rarely see the court are not going to be in contention for making the All-Star roster as is, I decided to subset our data to retain only players who played <em>at least</em> 15 minutes per 48 minute game. This was in an attempt to reduce the noise caused by an overwhelming amount of players who only enter games for a handful of minutes per game at best, who’s statistics would intuitively not bring any predictive power in separating All-Stars versus those who are not.</p>
+<p>Another concern was the data being too imbalanced for a model to find meaningful signal in. Most NBA seasons see over 450 individual players log minutes in at least one game. Left as this, the league would contain roughly ~5% All-Stars, crossing into rare-event territory. Seeing as players who rarely see the court are not going to be in contention for making the All-Star roster as is, I decided to subset our data to retain only players who played <em>at least</em> 15 minutes per 48 minute game. This was in an attempt to reduce the noise caused by an overwhelming amount of players who only enter games for a handful of minutes per game at best, who’s statistics would intuitively not bring any predictive power in separating All-Stars versus those who are not. Another point of note
+is that across NBA history, the All-Star who played the least minutes per game was Dirk Nowitzki in 2018-19. Since
+no other NBA player in history has made an All-Star game without playing at least 15 minutes per game, I deemed
+this a useful cutoff for players that would be deemed up for contention to be an All-Star.</p>
 <pre><code>df = df[df[&#39;MP&#39;] &gt;= 15]</code></pre>
 <p>Lastly, there were some miscellaneous manipulations that needed to be made to the datasets, such dropping irrelevant variables such as an ID variable, and removing random special characters found in some observations.</p>
 <pre><code>df = df.drop([&#39;Rk&#39;,&#39;Player-additional&#39;,&#39;Tm&#39;], axis=1)
@@ -276,34 +282,31 @@ df[&#39;Player&#39;] = df[&#39;Player&#39;].str.replace(&#39;\W&#39;, &#39;&#39;
 <p><strong>Target Variable Creation</strong></p>
 <p>Next, I created lists of each of the All-Star rosters from the past 19 seasons. I then assigned a new variable, ‘AllStar’, to each player in each dataset. Players who were on the All-Star roster for that season received a value of 1, while players who were not All-Stars received a 0. An example of this is shown below. The object “ASG03” represents the list of All-Stars from the 2003-04 season.</p>
 <pre><code>s03[&#39;AllStar&#39;] = np.where(np.isin(s03[&#39;Player&#39;],ASG03), 1, 0)</code></pre>
-<pre><code>## 0    263
-## 1     25
-## Name: AllStar, dtype: int64</code></pre>
 <p>Now that each of the individual datasets have been properly manipulated with the target variable added, we can concatenate them together to form our training dataset.</p>
-<div class="sourceCode" id="cb12"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co">#re-establish dfList with updated DFs</span></span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>dfList <span class="op">=</span> [s03,s04,s05,s06,s07,s08,s09,s10,s11,s12,s13,s14,s15,s16,s17,s18,s19,s20,s21]</span>
-<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="co">#Concatenate the training seasons</span></span>
-<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>train <span class="op">=</span> pd.concat(dfList)</span></code></pre></div>
+<div class="sourceCode" id="cb11"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co">#re-establish dfList with updated DFs</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>dfList <span class="op">=</span> [s03,s04,s05,s06,s07,s08,s09,s10,s11,s12,s13,s14,s15,s16,s17,s18,s19,s20,s21]</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="co">#Concatenate the training seasons</span></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>train <span class="op">=</span> pd.concat(dfList)</span></code></pre></div>
 <p>Quickly we will check the distribution of All-Stars(1) in our overall training set.</p>
-<div class="sourceCode" id="cb13"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>train[<span class="st">&#39;AllStar&#39;</span>].value_counts()</span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="co">#roughly 8% of the data is AllStar, may not need to oversample</span></span></code></pre></div>
+<div class="sourceCode" id="cb12"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>train[<span class="st">&#39;AllStar&#39;</span>].value_counts()</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="co">#roughly 8% of the data is AllStar, may not need to oversample</span></span></code></pre></div>
 <pre><code>## 0    5563
 ## 1     494
 ## Name: AllStar, dtype: int64</code></pre>
 <p>Next, I applied a label encoder to ensure the target variable is an appropriate binary object for modeling
 purposes.</p>
-<div class="sourceCode" id="cb15"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Change numeric to binary target</span></span>
-<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>label_encoder <span class="op">=</span> LabelEncoder()</span>
-<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>train[<span class="st">&#39;AllStar&#39;</span>] <span class="op">=</span> label_encoder.fit_transform(train[<span class="st">&#39;AllStar&#39;</span>])</span></code></pre></div>
+<div class="sourceCode" id="cb14"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Change numeric to binary target</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>label_encoder <span class="op">=</span> LabelEncoder()</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>train[<span class="st">&#39;AllStar&#39;</span>] <span class="op">=</span> label_encoder.fit_transform(train[<span class="st">&#39;AllStar&#39;</span>])</span></code></pre></div>
 <p>Since we have added the appropriate All-Star labels to all players in our training set now, we can now
 drop the player name variable, as it does not provide any predictive power.</p>
-<div class="sourceCode" id="cb16"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Drop player col</span></span>
-<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>train <span class="op">=</span> train.drop([<span class="st">&#39;Player&#39;</span>], axis<span class="op">=</span><span class="dv">1</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb15"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Drop player col</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>train <span class="op">=</span> train.drop([<span class="st">&#39;Player&#39;</span>], axis<span class="op">=</span><span class="dv">1</span>)</span></code></pre></div>
 <p>Next, I noticed the dataset took many values for the position variable, as some players are listed as
 playing two positions (ex: “PG-SG”). To clean this up, I combined levels into the guard and frontcourt
 labels we will use for our predicted roster selection.</p>
-<div class="sourceCode" id="cb17"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Check which values of position are taken across training set for aggregation</span></span>
-<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>train.Pos.value_counts()</span></code></pre></div>
+<div class="sourceCode" id="cb16"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Check which values of position are taken across training set for aggregation</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>train.Pos.value_counts()</span></code></pre></div>
 <pre><code>## SG          1335
 ## PG          1207
 ## PF          1158
@@ -321,70 +324,313 @@ labels we will use for our predicted roster selection.</p>
 ## PG-SF          1
 ## SG-PG-SF       1
 ## Name: Pos, dtype: int64</code></pre>
-<div class="sourceCode" id="cb19"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Combine Guard/Front-Court positions</span></span>
-<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>train[<span class="st">&#39;Pos&#39;</span>] <span class="op">=</span> np.where(((train[<span class="st">&#39;Pos&#39;</span>].eq(<span class="st">&#39;PG&#39;</span>)) <span class="op">|</span> (train[<span class="st">&#39;Pos&#39;</span>].eq(<span class="st">&#39;SG&#39;</span>)) <span class="op">|</span> (train[<span class="st">&#39;Pos&#39;</span>].eq(<span class="st">&#39;PG-SG&#39;</span>)) <span class="op">|</span>(train[<span class="st">&#39;Pos&#39;</span>].eq(<span class="st">&#39;SG-PG&#39;</span>)) <span class="op">|</span></span>
-<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>                         (train[<span class="st">&#39;Pos&#39;</span>].eq(<span class="st">&#39;SG-PF&#39;</span>))<span class="op">|</span></span>
-<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>    (train[<span class="st">&#39;Pos&#39;</span>].eq(<span class="st">&#39;SG-PG-SF&#39;</span>))),<span class="st">&#39;Guard&#39;</span>,<span class="st">&#39;FrontCourt&#39;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb18"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Combine Guard/Front-Court positions</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>train[<span class="st">&#39;Pos&#39;</span>] <span class="op">=</span> np.where(((train[<span class="st">&#39;Pos&#39;</span>].eq(<span class="st">&#39;PG&#39;</span>)) <span class="op">|</span> (train[<span class="st">&#39;Pos&#39;</span>].eq(<span class="st">&#39;SG&#39;</span>)) <span class="op">|</span> (train[<span class="st">&#39;Pos&#39;</span>].eq(<span class="st">&#39;PG-SG&#39;</span>)) <span class="op">|</span>(train[<span class="st">&#39;Pos&#39;</span>].eq(<span class="st">&#39;SG-PG&#39;</span>)) <span class="op">|</span></span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>                         (train[<span class="st">&#39;Pos&#39;</span>].eq(<span class="st">&#39;SG-PF&#39;</span>))<span class="op">|</span></span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>    (train[<span class="st">&#39;Pos&#39;</span>].eq(<span class="st">&#39;SG-PG-SF&#39;</span>))),<span class="st">&#39;Guard&#39;</span>,<span class="st">&#39;Frontcourt&#39;</span>)</span></code></pre></div>
 <p>Tree based models like an XGBoost generally do not do well handling categorical variables. For this
 reason, I decided to use One-Hot Encoding on our categorical position variable.</p>
-<div class="sourceCode" id="cb20"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>transformer <span class="op">=</span> make_column_transformer(</span>
-<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>    (OneHotEncoder(sparse<span class="op">=</span><span class="va">False</span>), [<span class="st">&#39;Pos&#39;</span>]),</span>
-<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>    remainder <span class="op">=</span> <span class="st">&#39;passthrough&#39;</span></span>
-<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>transformed <span class="op">=</span> transformer.fit_transform(train)</span>
-<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>train <span class="op">=</span> pd.DataFrame(transformed, columns<span class="op">=</span>transformer.get_feature_names_out())</span></code></pre></div>
+<div class="sourceCode" id="cb19"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>transformer <span class="op">=</span> make_column_transformer(</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>    (OneHotEncoder(sparse<span class="op">=</span><span class="va">False</span>), [<span class="st">&#39;Pos&#39;</span>]),</span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>    remainder <span class="op">=</span> <span class="st">&#39;passthrough&#39;</span></span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>transformed <span class="op">=</span> transformer.fit_transform(train)</span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>train <span class="op">=</span> pd.DataFrame(transformed, columns<span class="op">=</span>transformer.get_feature_names_out())</span></code></pre></div>
 <p><strong>Test Dataset</strong></p>
 <p>Now that our training dataset is finalized, we now can create our test dataset with the current season’s
 data. As always in a modeling project, we must manipulate the test set in the same manner we did our training
 set.</p>
-<div class="sourceCode" id="cb21"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Test set read in</span></span>
-<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>test <span class="op">=</span> pd.read_csv(<span class="st">&#39;C:/Users/ericd/OneDrive - North Carolina State University/Desktop/NBA-AllStar-Predictions/Data/season22-23.csv&#39;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb20"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Test set read in</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>test <span class="op">=</span> pd.read_csv(<span class="st">&#39;C:/Users/ericd/OneDrive - North Carolina State University/Desktop/NBA-AllStar-Predictions/Data/season22-23.csv&#39;</span>)</span></code></pre></div>
 <p>Similar to with the training set, I created a new function to apply all manipulations to the test set at once, including the scaling, position variable cleaning, and One-Hot Encoding.</p>
-<div class="sourceCode" id="cb22"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Test set cleaning function</span></span>
-<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> testPrep(df):</span>
-<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>    df <span class="op">=</span> df.sort_values([<span class="st">&#39;Player&#39;</span>,<span class="st">&#39;G&#39;</span>], ascending <span class="op">=</span> [<span class="va">True</span>, <span class="va">False</span>])</span>
-<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>    df <span class="op">=</span> df.drop_duplicates(subset<span class="op">=</span>[<span class="st">&#39;Player&#39;</span>], keep<span class="op">=</span><span class="st">&#39;first&#39;</span>)</span>
-<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>    df <span class="op">=</span> df[df[<span class="st">&#39;MP&#39;</span>] <span class="op">&gt;=</span> <span class="dv">15</span>]</span>
-<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>    df <span class="op">=</span> df.drop([<span class="st">&#39;Rk&#39;</span>,<span class="st">&#39;Tm&#39;</span>], axis<span class="op">=</span><span class="dv">1</span>)</span>
-<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a>    df[<span class="st">&#39;Age&#39;</span>] <span class="op">=</span> zscore(df[<span class="st">&#39;Age&#39;</span>])</span>
-<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a>    df[<span class="st">&#39;G&#39;</span>] <span class="op">=</span> zscore(df[<span class="st">&#39;G&#39;</span>])</span>
-<span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a>    df[<span class="st">&#39;GS&#39;</span>] <span class="op">=</span> zscore(df[<span class="st">&#39;GS&#39;</span>])</span>
-<span id="cb22-10"><a href="#cb22-10" aria-hidden="true" tabindex="-1"></a>    df[<span class="st">&#39;MP&#39;</span>] <span class="op">=</span> zscore(df[<span class="st">&#39;MP&#39;</span>])</span>
-<span id="cb22-11"><a href="#cb22-11" aria-hidden="true" tabindex="-1"></a>    df[<span class="st">&#39;FG&#39;</span>] <span class="op">=</span> zscore(df[<span class="st">&#39;FG&#39;</span>])</span>
-<span id="cb22-12"><a href="#cb22-12" aria-hidden="true" tabindex="-1"></a>    df[<span class="st">&#39;FGA&#39;</span>] <span class="op">=</span> zscore(df[<span class="st">&#39;FGA&#39;</span>])</span>
-<span id="cb22-13"><a href="#cb22-13" aria-hidden="true" tabindex="-1"></a>    df[<span class="st">&#39;FG%&#39;</span>] <span class="op">=</span> zscore(df[<span class="st">&#39;FG%&#39;</span>])</span>
-<span id="cb22-14"><a href="#cb22-14" aria-hidden="true" tabindex="-1"></a>    df[<span class="st">&#39;3P&#39;</span>] <span class="op">=</span> zscore(df[<span class="st">&#39;3P&#39;</span>])</span>
-<span id="cb22-15"><a href="#cb22-15" aria-hidden="true" tabindex="-1"></a>    df[<span class="st">&#39;3PA&#39;</span>] <span class="op">=</span> zscore(df[<span class="st">&#39;3PA&#39;</span>])</span>
-<span id="cb22-16"><a href="#cb22-16" aria-hidden="true" tabindex="-1"></a>    df[<span class="st">&#39;2P&#39;</span>] <span class="op">=</span> zscore(df[<span class="st">&#39;2P&#39;</span>])</span>
-<span id="cb22-17"><a href="#cb22-17" aria-hidden="true" tabindex="-1"></a>    df[<span class="st">&#39;2PA&#39;</span>] <span class="op">=</span> zscore(df[<span class="st">&#39;2PA&#39;</span>])</span>
-<span id="cb22-18"><a href="#cb22-18" aria-hidden="true" tabindex="-1"></a>    df[<span class="st">&#39;2P%&#39;</span>] <span class="op">=</span> zscore(df[<span class="st">&#39;2P%&#39;</span>])</span>
-<span id="cb22-19"><a href="#cb22-19" aria-hidden="true" tabindex="-1"></a>    df[<span class="st">&#39;eFG%&#39;</span>] <span class="op">=</span> zscore(df[<span class="st">&#39;eFG%&#39;</span>])</span>
-<span id="cb22-20"><a href="#cb22-20" aria-hidden="true" tabindex="-1"></a>    df[<span class="st">&#39;FT&#39;</span>] <span class="op">=</span> zscore(df[<span class="st">&#39;FT&#39;</span>])</span>
-<span id="cb22-21"><a href="#cb22-21" aria-hidden="true" tabindex="-1"></a>    df[<span class="st">&#39;FTA&#39;</span>] <span class="op">=</span> zscore(df[<span class="st">&#39;FTA&#39;</span>])</span>
-<span id="cb22-22"><a href="#cb22-22" aria-hidden="true" tabindex="-1"></a>    df[<span class="st">&#39;FT%&#39;</span>] <span class="op">=</span> zscore(df[<span class="st">&#39;FT%&#39;</span>])</span>
-<span id="cb22-23"><a href="#cb22-23" aria-hidden="true" tabindex="-1"></a>    df[<span class="st">&#39;ORB&#39;</span>] <span class="op">=</span> zscore(df[<span class="st">&#39;ORB&#39;</span>])</span>
-<span id="cb22-24"><a href="#cb22-24" aria-hidden="true" tabindex="-1"></a>    df[<span class="st">&#39;DRB&#39;</span>] <span class="op">=</span> zscore(df[<span class="st">&#39;DRB&#39;</span>])</span>
-<span id="cb22-25"><a href="#cb22-25" aria-hidden="true" tabindex="-1"></a>    df[<span class="st">&#39;TRB&#39;</span>] <span class="op">=</span> zscore(df[<span class="st">&#39;TRB&#39;</span>])</span>
-<span id="cb22-26"><a href="#cb22-26" aria-hidden="true" tabindex="-1"></a>    df[<span class="st">&#39;AST&#39;</span>] <span class="op">=</span> zscore(df[<span class="st">&#39;AST&#39;</span>])</span>
-<span id="cb22-27"><a href="#cb22-27" aria-hidden="true" tabindex="-1"></a>    df[<span class="st">&#39;STL&#39;</span>] <span class="op">=</span> zscore(df[<span class="st">&#39;STL&#39;</span>])</span>
-<span id="cb22-28"><a href="#cb22-28" aria-hidden="true" tabindex="-1"></a>    df[<span class="st">&#39;BLK&#39;</span>] <span class="op">=</span> zscore(df[<span class="st">&#39;BLK&#39;</span>])</span>
-<span id="cb22-29"><a href="#cb22-29" aria-hidden="true" tabindex="-1"></a>    df[<span class="st">&#39;TOV&#39;</span>] <span class="op">=</span> zscore(df[<span class="st">&#39;TOV&#39;</span>])</span>
-<span id="cb22-30"><a href="#cb22-30" aria-hidden="true" tabindex="-1"></a>    df[<span class="st">&#39;PF&#39;</span>] <span class="op">=</span> zscore(df[<span class="st">&#39;PF&#39;</span>])</span>
-<span id="cb22-31"><a href="#cb22-31" aria-hidden="true" tabindex="-1"></a>    df[<span class="st">&#39;PTS&#39;</span>] <span class="op">=</span> zscore(df[<span class="st">&#39;PTS&#39;</span>])</span>
-<span id="cb22-32"><a href="#cb22-32" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb22-33"><a href="#cb22-33" aria-hidden="true" tabindex="-1"></a>    df[<span class="st">&#39;Pos&#39;</span>] <span class="op">=</span> np.where(((df[<span class="st">&#39;Pos&#39;</span>].eq(<span class="st">&#39;PG&#39;</span>)) <span class="op">|</span> (df[<span class="st">&#39;Pos&#39;</span>].eq(<span class="st">&#39;SG&#39;</span>))),<span class="st">&#39;Guard&#39;</span>,<span class="st">&#39;Frontcourt&#39;</span>)</span>
-<span id="cb22-34"><a href="#cb22-34" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb22-35"><a href="#cb22-35" aria-hidden="true" tabindex="-1"></a>    <span class="co">#one hot encoding for test</span></span>
-<span id="cb22-36"><a href="#cb22-36" aria-hidden="true" tabindex="-1"></a>    transformer <span class="op">=</span> make_column_transformer(</span>
-<span id="cb22-37"><a href="#cb22-37" aria-hidden="true" tabindex="-1"></a>    (OneHotEncoder(sparse<span class="op">=</span><span class="va">False</span>), [<span class="st">&#39;Pos&#39;</span>]),</span>
-<span id="cb22-38"><a href="#cb22-38" aria-hidden="true" tabindex="-1"></a>    remainder <span class="op">=</span> <span class="st">&#39;passthrough&#39;</span></span>
-<span id="cb22-39"><a href="#cb22-39" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb22-40"><a href="#cb22-40" aria-hidden="true" tabindex="-1"></a>    transformed <span class="op">=</span> transformer.fit_transform(df)</span>
-<span id="cb22-41"><a href="#cb22-41" aria-hidden="true" tabindex="-1"></a>    df <span class="op">=</span> pd.DataFrame(transformed, columns<span class="op">=</span>transformer.get_feature_names_out())</span>
-<span id="cb22-42"><a href="#cb22-42" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> df</span></code></pre></div>
+<div class="sourceCode" id="cb21"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Test set cleaning function</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> testPrep(df):</span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>    df <span class="op">=</span> df.sort_values([<span class="st">&#39;Player&#39;</span>,<span class="st">&#39;G&#39;</span>], ascending <span class="op">=</span> [<span class="va">True</span>, <span class="va">False</span>])</span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>    df <span class="op">=</span> df.drop_duplicates(subset<span class="op">=</span>[<span class="st">&#39;Player&#39;</span>], keep<span class="op">=</span><span class="st">&#39;first&#39;</span>)</span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>    df <span class="op">=</span> df[df[<span class="st">&#39;MP&#39;</span>] <span class="op">&gt;=</span> <span class="dv">15</span>]</span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a>    df <span class="op">=</span> df.drop([<span class="st">&#39;Rk&#39;</span>,<span class="st">&#39;Tm&#39;</span>], axis<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a>    df[<span class="st">&#39;Age&#39;</span>] <span class="op">=</span> zscore(df[<span class="st">&#39;Age&#39;</span>])</span>
+<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a>    df[<span class="st">&#39;G&#39;</span>] <span class="op">=</span> zscore(df[<span class="st">&#39;G&#39;</span>])</span>
+<span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a>    df[<span class="st">&#39;GS&#39;</span>] <span class="op">=</span> zscore(df[<span class="st">&#39;GS&#39;</span>])</span>
+<span id="cb21-10"><a href="#cb21-10" aria-hidden="true" tabindex="-1"></a>    df[<span class="st">&#39;MP&#39;</span>] <span class="op">=</span> zscore(df[<span class="st">&#39;MP&#39;</span>])</span>
+<span id="cb21-11"><a href="#cb21-11" aria-hidden="true" tabindex="-1"></a>    df[<span class="st">&#39;FG&#39;</span>] <span class="op">=</span> zscore(df[<span class="st">&#39;FG&#39;</span>])</span>
+<span id="cb21-12"><a href="#cb21-12" aria-hidden="true" tabindex="-1"></a>    df[<span class="st">&#39;FGA&#39;</span>] <span class="op">=</span> zscore(df[<span class="st">&#39;FGA&#39;</span>])</span>
+<span id="cb21-13"><a href="#cb21-13" aria-hidden="true" tabindex="-1"></a>    df[<span class="st">&#39;FG%&#39;</span>] <span class="op">=</span> zscore(df[<span class="st">&#39;FG%&#39;</span>])</span>
+<span id="cb21-14"><a href="#cb21-14" aria-hidden="true" tabindex="-1"></a>    df[<span class="st">&#39;3P&#39;</span>] <span class="op">=</span> zscore(df[<span class="st">&#39;3P&#39;</span>])</span>
+<span id="cb21-15"><a href="#cb21-15" aria-hidden="true" tabindex="-1"></a>    df[<span class="st">&#39;3PA&#39;</span>] <span class="op">=</span> zscore(df[<span class="st">&#39;3PA&#39;</span>])</span>
+<span id="cb21-16"><a href="#cb21-16" aria-hidden="true" tabindex="-1"></a>    df[<span class="st">&#39;2P&#39;</span>] <span class="op">=</span> zscore(df[<span class="st">&#39;2P&#39;</span>])</span>
+<span id="cb21-17"><a href="#cb21-17" aria-hidden="true" tabindex="-1"></a>    df[<span class="st">&#39;2PA&#39;</span>] <span class="op">=</span> zscore(df[<span class="st">&#39;2PA&#39;</span>])</span>
+<span id="cb21-18"><a href="#cb21-18" aria-hidden="true" tabindex="-1"></a>    df[<span class="st">&#39;2P%&#39;</span>] <span class="op">=</span> zscore(df[<span class="st">&#39;2P%&#39;</span>])</span>
+<span id="cb21-19"><a href="#cb21-19" aria-hidden="true" tabindex="-1"></a>    df[<span class="st">&#39;eFG%&#39;</span>] <span class="op">=</span> zscore(df[<span class="st">&#39;eFG%&#39;</span>])</span>
+<span id="cb21-20"><a href="#cb21-20" aria-hidden="true" tabindex="-1"></a>    df[<span class="st">&#39;FT&#39;</span>] <span class="op">=</span> zscore(df[<span class="st">&#39;FT&#39;</span>])</span>
+<span id="cb21-21"><a href="#cb21-21" aria-hidden="true" tabindex="-1"></a>    df[<span class="st">&#39;FTA&#39;</span>] <span class="op">=</span> zscore(df[<span class="st">&#39;FTA&#39;</span>])</span>
+<span id="cb21-22"><a href="#cb21-22" aria-hidden="true" tabindex="-1"></a>    df[<span class="st">&#39;FT%&#39;</span>] <span class="op">=</span> zscore(df[<span class="st">&#39;FT%&#39;</span>])</span>
+<span id="cb21-23"><a href="#cb21-23" aria-hidden="true" tabindex="-1"></a>    df[<span class="st">&#39;ORB&#39;</span>] <span class="op">=</span> zscore(df[<span class="st">&#39;ORB&#39;</span>])</span>
+<span id="cb21-24"><a href="#cb21-24" aria-hidden="true" tabindex="-1"></a>    df[<span class="st">&#39;DRB&#39;</span>] <span class="op">=</span> zscore(df[<span class="st">&#39;DRB&#39;</span>])</span>
+<span id="cb21-25"><a href="#cb21-25" aria-hidden="true" tabindex="-1"></a>    df[<span class="st">&#39;TRB&#39;</span>] <span class="op">=</span> zscore(df[<span class="st">&#39;TRB&#39;</span>])</span>
+<span id="cb21-26"><a href="#cb21-26" aria-hidden="true" tabindex="-1"></a>    df[<span class="st">&#39;AST&#39;</span>] <span class="op">=</span> zscore(df[<span class="st">&#39;AST&#39;</span>])</span>
+<span id="cb21-27"><a href="#cb21-27" aria-hidden="true" tabindex="-1"></a>    df[<span class="st">&#39;STL&#39;</span>] <span class="op">=</span> zscore(df[<span class="st">&#39;STL&#39;</span>])</span>
+<span id="cb21-28"><a href="#cb21-28" aria-hidden="true" tabindex="-1"></a>    df[<span class="st">&#39;BLK&#39;</span>] <span class="op">=</span> zscore(df[<span class="st">&#39;BLK&#39;</span>])</span>
+<span id="cb21-29"><a href="#cb21-29" aria-hidden="true" tabindex="-1"></a>    df[<span class="st">&#39;TOV&#39;</span>] <span class="op">=</span> zscore(df[<span class="st">&#39;TOV&#39;</span>])</span>
+<span id="cb21-30"><a href="#cb21-30" aria-hidden="true" tabindex="-1"></a>    df[<span class="st">&#39;PF&#39;</span>] <span class="op">=</span> zscore(df[<span class="st">&#39;PF&#39;</span>])</span>
+<span id="cb21-31"><a href="#cb21-31" aria-hidden="true" tabindex="-1"></a>    df[<span class="st">&#39;PTS&#39;</span>] <span class="op">=</span> zscore(df[<span class="st">&#39;PTS&#39;</span>])</span>
+<span id="cb21-32"><a href="#cb21-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-33"><a href="#cb21-33" aria-hidden="true" tabindex="-1"></a>    df[<span class="st">&#39;Pos&#39;</span>] <span class="op">=</span> np.where(((df[<span class="st">&#39;Pos&#39;</span>].eq(<span class="st">&#39;PG&#39;</span>)) <span class="op">|</span> (df[<span class="st">&#39;Pos&#39;</span>].eq(<span class="st">&#39;SG&#39;</span>))),<span class="st">&#39;Guard&#39;</span>,<span class="st">&#39;Frontcourt&#39;</span>)</span>
+<span id="cb21-34"><a href="#cb21-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-35"><a href="#cb21-35" aria-hidden="true" tabindex="-1"></a>    <span class="co">#one hot encoding for test</span></span>
+<span id="cb21-36"><a href="#cb21-36" aria-hidden="true" tabindex="-1"></a>    transformer <span class="op">=</span> make_column_transformer(</span>
+<span id="cb21-37"><a href="#cb21-37" aria-hidden="true" tabindex="-1"></a>    (OneHotEncoder(sparse<span class="op">=</span><span class="va">False</span>), [<span class="st">&#39;Pos&#39;</span>]),</span>
+<span id="cb21-38"><a href="#cb21-38" aria-hidden="true" tabindex="-1"></a>    remainder <span class="op">=</span> <span class="st">&#39;passthrough&#39;</span></span>
+<span id="cb21-39"><a href="#cb21-39" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb21-40"><a href="#cb21-40" aria-hidden="true" tabindex="-1"></a>    transformed <span class="op">=</span> transformer.fit_transform(df)</span>
+<span id="cb21-41"><a href="#cb21-41" aria-hidden="true" tabindex="-1"></a>    df <span class="op">=</span> pd.DataFrame(transformed, columns<span class="op">=</span>transformer.get_feature_names_out())</span>
+<span id="cb21-42"><a href="#cb21-42" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> df</span></code></pre></div>
 <p>I then ran the test set through the function defined above.</p>
-<div class="sourceCode" id="cb23"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Send test set through cleaning function</span></span>
-<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>test <span class="op">=</span> testPrep(test)</span></code></pre></div>
+<div class="sourceCode" id="cb22"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Send test set through cleaning function</span></span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>test <span class="op">=</span> testPrep(test)</span></code></pre></div>
+</div>
+<div id="exploratory-data-analysis-eda" class="section level2 hasAnchor" number="1.3">
+<h2><span class="header-section-number">1.3</span> Exploratory Data Analysis (EDA)<a href="#exploratory-data-analysis-eda" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>Now it was time to look at a few of our variables at a closer level. Intuitively we can expect that All-Stars
+generally have better stats than the average player, it is also important to remember that minutes played per game
+likely plays a large role in statistics as well. Let’s take a look at some of these variables visually.</p>
+<p>First let’s see how minutes and points correlate.
+<img src="bookdownproj_files/figure-html/unnamed-chunk-21-1.png" width="768" />
+As we can see, there is a pretty clear positive, linear relationship between the variables. However, one thing
+to note is how after the scaled minutes per game value exceeds 1, the points per game values seem to increase at a
+slightly steeper rate. This could be, as previously mentioned, the fact that the best players play the most
+minutes, and are also the ones scoring the most points.</p>
+<p>Next we will take a look at how points per game looks across our All-Stars versus non All-Stars.</p>
+<div class="sourceCode" id="cb23"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>sns.boxplot(x <span class="op">=</span> train[<span class="st">&#39;remainder__AllStar&#39;</span>],</span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>            y <span class="op">=</span> train[<span class="st">&#39;remainder__PTS&#39;</span>])</span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">&#39;Boxplot of Points/Game by All-Star Status&#39;</span>)</span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">&#39;All-Star Status&#39;</span>)</span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">&#39;Points/Game (Scaled)&#39;</span>)</span></code></pre></div>
+<p><img src="bookdownproj_files/figure-html/unnamed-chunk-22-3.png" width="768" />
+Unsurprisingly, All-Stars are generally scoring at a much more standout level compared to their peers. In fact,
+the median scoring value for an All-Star is about 2 standard deviations from league standard, which encompasses
+roughly the top 5% of scorers in the league. It is also noted that there were outliers for All-Stars that scored
+below the league standard.</p>
+<p>Next, let’s take a look at how field goal % compares across All-Star status.
+<img src="bookdownproj_files/figure-html/unnamed-chunk-23-5.png" width="768" /></p>
+<p>Interesting to see how the medians across both groups are roughly at 0, or league standard. However, the most
+notable observation here is how the spread of the non All-Stars is vastly larger than the All-Stars, stretching
+down as far as nearly 8 standard deviations below the mean.</p>
+<p>Lastly, let’s take a look at a correlation matrix across all of our variables.
+<img src="bookdownproj_files/figure-html/unnamed-chunk-24-7.png" width="768" />
+While a bit difficult to interpret easily, there are a few interesting takeaways. First, Field Goal % seems to
+have a strong, negative correlation with some of the other shooting statistics. This may represent players who
+take very few shots, but make them at a high clip, leaving them with high shooting percentages with low attempts.
+We also see that the age variable seems to have no notable correlations with any other variable. I would have
+expected to see stats, especially percentages, drop as a player ages, but evidently this is not as glaring of
+a trend as I thought.</p>
+</div>
+<div id="modeling" class="section level2 hasAnchor" number="1.4">
+<h2><span class="header-section-number">1.4</span> Modeling<a href="#modeling" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>Now that our training/test datasets are prepared and we have explored our data, it is time to set up our modeling
+procedure.</p>
+<p><strong>Data Split</strong></p>
+<p>First, we will create our X and Y objects. The X object will contain only our predictor variables, while the Y
+object will be a list containing the values of the target variable.</p>
+<div class="sourceCode" id="cb24"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Create X and Y object for data split function</span></span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>X <span class="op">=</span> train.drop([<span class="st">&#39;remainder__AllStar&#39;</span>],axis<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>Y <span class="op">=</span> train[<span class="st">&#39;remainder__AllStar&#39;</span>].values</span></code></pre></div>
+<p>Since we do not have the All-Star values for our test set at the time of this writing, I chose to split our training
+set into a training and validation set. The true training set will be used to build the model on, with the
+validation set being used for model assessment. The code to split these datasets is shown below.</p>
+<div class="sourceCode" id="cb25"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="co">#data split</span></span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>X_train, X_valid, Y_train, Y_valid <span class="op">=</span> train_test_split(X, Y, test_size <span class="op">=</span> <span class="fl">.2</span>, stratify<span class="op">=</span>Y, random_state<span class="op">=</span><span class="dv">20</span>)</span></code></pre></div>
+<p><strong>Model Fitting</strong></p>
+<p>Next, I will establish our XGBoost regressor object.</p>
+<div class="sourceCode" id="cb26"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Establish XGB regressor</span></span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>xgb_model <span class="op">=</span> xgb.XGBRegressor(objective<span class="op">=</span><span class="st">&quot;binary:logistic&quot;</span>, random_state<span class="op">=</span><span class="dv">0</span>)</span></code></pre></div>
+<p>Cross-validation is a key technique to apply in model building to help avoid over-fitting on the training set. For
+our model, I will use 10-fold cross-validation, repeated 3 times.</p>
+<div class="sourceCode" id="cb27"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Set CV params</span></span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>cv <span class="op">=</span> RepeatedStratifiedKFold(n_splits <span class="op">=</span> <span class="dv">10</span>, n_repeats <span class="op">=</span> <span class="dv">3</span>, random_state<span class="op">=</span><span class="dv">0</span>)</span></code></pre></div>
+<p>I decided to utilize a small grid search across tuning hyperparameters for the model. This allows us to try out
+many combinations of key aspects of an XGBoost such as the depth of the trees and number of trees in the forest.</p>
+<div class="sourceCode" id="cb28"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Establish tuning parameters</span></span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>params <span class="op">=</span> {</span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;max_depth&quot;</span>:[<span class="dv">10</span>,<span class="dv">15</span>,<span class="dv">20</span>],</span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;n_estimators&quot;</span>:[<span class="dv">200</span>,<span class="dv">400</span>,<span class="dv">600</span>],</span>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;min_samples_split&quot;</span>:[<span class="dv">5</span>,<span class="dv">10</span>]</span>
+<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+<p>Next, I set our grid search object with the tuning parameters and cross-validation specifics. I chose area under
+the ROC curve (AUROC) to serve as our cross-validation metric.</p>
+<div class="sourceCode" id="cb29"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Set gridsearch object. Use ROC as our CV measure</span></span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>clf <span class="op">=</span> GridSearchCV(xgb_model, params, cv<span class="op">=</span>cv, scoring<span class="op">=</span><span class="st">&#39;roc_auc&#39;</span>)</span></code></pre></div>
+<p>Now it is time to run the model.</p>
+<div class="sourceCode" id="cb30"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Fit model</span></span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>tick <span class="op">=</span> time.time()</span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>clf.fit(X_train,Y_train)</span></code></pre></div>
+<style>#sk-container-id-6 {color: black;background-color: white;}#sk-container-id-6 pre{padding: 0;}#sk-container-id-6 div.sk-toggleable {background-color: white;}#sk-container-id-6 label.sk-toggleable__label {cursor: pointer;display: block;width: 100%;margin-bottom: 0;padding: 0.3em;box-sizing: border-box;text-align: center;}#sk-container-id-6 label.sk-toggleable__label-arrow:before {content: "▸";float: left;margin-right: 0.25em;color: #696969;}#sk-container-id-6 label.sk-toggleable__label-arrow:hover:before {color: black;}#sk-container-id-6 div.sk-estimator:hover label.sk-toggleable__label-arrow:before {color: black;}#sk-container-id-6 div.sk-toggleable__content {max-height: 0;max-width: 0;overflow: hidden;text-align: left;background-color: #f0f8ff;}#sk-container-id-6 div.sk-toggleable__content pre {margin: 0.2em;color: black;border-radius: 0.25em;background-color: #f0f8ff;}#sk-container-id-6 input.sk-toggleable__control:checked~div.sk-toggleable__content {max-height: 200px;max-width: 100%;overflow: auto;}#sk-container-id-6 input.sk-toggleable__control:checked~label.sk-toggleable__label-arrow:before {content: "▾";}#sk-container-id-6 div.sk-estimator input.sk-toggleable__control:checked~label.sk-toggleable__label {background-color: #d4ebff;}#sk-container-id-6 div.sk-label input.sk-toggleable__control:checked~label.sk-toggleable__label {background-color: #d4ebff;}#sk-container-id-6 input.sk-hidden--visually {border: 0;clip: rect(1px 1px 1px 1px);clip: rect(1px, 1px, 1px, 1px);height: 1px;margin: -1px;overflow: hidden;padding: 0;position: absolute;width: 1px;}#sk-container-id-6 div.sk-estimator {font-family: monospace;background-color: #f0f8ff;border: 1px dotted black;border-radius: 0.25em;box-sizing: border-box;margin-bottom: 0.5em;}#sk-container-id-6 div.sk-estimator:hover {background-color: #d4ebff;}#sk-container-id-6 div.sk-parallel-item::after {content: "";width: 100%;border-bottom: 1px solid gray;flex-grow: 1;}#sk-container-id-6 div.sk-label:hover label.sk-toggleable__label {background-color: #d4ebff;}#sk-container-id-6 div.sk-serial::before {content: "";position: absolute;border-left: 1px solid gray;box-sizing: border-box;top: 0;bottom: 0;left: 50%;z-index: 0;}#sk-container-id-6 div.sk-serial {display: flex;flex-direction: column;align-items: center;background-color: white;padding-right: 0.2em;padding-left: 0.2em;position: relative;}#sk-container-id-6 div.sk-item {position: relative;z-index: 1;}#sk-container-id-6 div.sk-parallel {display: flex;align-items: stretch;justify-content: center;background-color: white;position: relative;}#sk-container-id-6 div.sk-item::before, #sk-container-id-6 div.sk-parallel-item::before {content: "";position: absolute;border-left: 1px solid gray;box-sizing: border-box;top: 0;bottom: 0;left: 50%;z-index: -1;}#sk-container-id-6 div.sk-parallel-item {display: flex;flex-direction: column;z-index: 1;position: relative;background-color: white;}#sk-container-id-6 div.sk-parallel-item:first-child::after {align-self: flex-end;width: 50%;}#sk-container-id-6 div.sk-parallel-item:last-child::after {align-self: flex-start;width: 50%;}#sk-container-id-6 div.sk-parallel-item:only-child::after {width: 0;}#sk-container-id-6 div.sk-dashed-wrapped {border: 1px dashed gray;margin: 0 0.4em 0.5em 0.4em;box-sizing: border-box;padding-bottom: 0.4em;background-color: white;}#sk-container-id-6 div.sk-label label {font-family: monospace;font-weight: bold;display: inline-block;line-height: 1.2em;}#sk-container-id-6 div.sk-label-container {text-align: center;}#sk-container-id-6 div.sk-container {/* jupyter's `normalize.less` sets `[hidden] { display: none; }` but bootstrap.min.css set `[hidden] { display: none !important; }` so we also need the `!important` here to be able to override the default hidden behavior on the sphinx rendered scikit-learn.org. See: https://github.com/scikit-learn/scikit-learn/issues/21755 */display: inline-block !important;position: relative;}#sk-container-id-6 div.sk-text-repr-fallback {display: none;}</style><div id="sk-container-id-6" class="sk-top-container"><div class="sk-text-repr-fallback"><pre>GridSearchCV(cv=RepeatedStratifiedKFold(n_repeats=3, n_splits=10, random_state=0),
+             estimator=XGBRegressor(base_score=None, booster=None,
+                                    callbacks=None, colsample_bylevel=None,
+                                    colsample_bynode=None,
+                                    colsample_bytree=None,
+                                    early_stopping_rounds=None,
+                                    enable_categorical=False, eval_metric=None,
+                                    feature_types=None, gamma=None, gpu_id=None,
+                                    grow_policy=None, importan...
+                                    max_cat_threshold=None,
+                                    max_cat_to_onehot=None, max_delta_step=None,
+                                    max_depth=None, max_leaves=None,
+                                    min_child_weight=None, missing=nan,
+                                    monotone_constraints=None, n_estimators=100,
+                                    n_jobs=None, num_parallel_tree=None,
+                                    objective=&#x27;binary:logistic&#x27;, predictor=None, ...),
+             param_grid={&#x27;max_depth&#x27;: [10, 15, 20],
+                         &#x27;min_samples_split&#x27;: [5, 10],
+                         &#x27;n_estimators&#x27;: [200, 400, 600]},
+             scoring=&#x27;roc_auc&#x27;)</pre><b>In a Jupyter environment, please rerun this cell to show the HTML representation or trust the notebook. <br />On GitHub, the HTML representation is unable to render, please try loading this page with nbviewer.org.</b></div><div class="sk-container" hidden><div class="sk-item sk-dashed-wrapped"><div class="sk-label-container"><div class="sk-label sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-16" type="checkbox" ><label for="sk-estimator-id-16" class="sk-toggleable__label sk-toggleable__label-arrow">GridSearchCV</label><div class="sk-toggleable__content"><pre>GridSearchCV(cv=RepeatedStratifiedKFold(n_repeats=3, n_splits=10, random_state=0),
+             estimator=XGBRegressor(base_score=None, booster=None,
+                                    callbacks=None, colsample_bylevel=None,
+                                    colsample_bynode=None,
+                                    colsample_bytree=None,
+                                    early_stopping_rounds=None,
+                                    enable_categorical=False, eval_metric=None,
+                                    feature_types=None, gamma=None, gpu_id=None,
+                                    grow_policy=None, importan...
+                                    max_cat_threshold=None,
+                                    max_cat_to_onehot=None, max_delta_step=None,
+                                    max_depth=None, max_leaves=None,
+                                    min_child_weight=None, missing=nan,
+                                    monotone_constraints=None, n_estimators=100,
+                                    n_jobs=None, num_parallel_tree=None,
+                                    objective=&#x27;binary:logistic&#x27;, predictor=None, ...),
+             param_grid={&#x27;max_depth&#x27;: [10, 15, 20],
+                         &#x27;min_samples_split&#x27;: [5, 10],
+                         &#x27;n_estimators&#x27;: [200, 400, 600]},
+             scoring=&#x27;roc_auc&#x27;)</pre></div></div></div><div class="sk-parallel"><div class="sk-parallel-item"><div class="sk-item"><div class="sk-label-container"><div class="sk-label sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-17" type="checkbox" ><label for="sk-estimator-id-17" class="sk-toggleable__label sk-toggleable__label-arrow">estimator: XGBRegressor</label><div class="sk-toggleable__content"><pre>XGBRegressor(base_score=None, booster=None, callbacks=None,
+             colsample_bylevel=None, colsample_bynode=None,
+             colsample_bytree=None, early_stopping_rounds=None,
+             enable_categorical=False, eval_metric=None, feature_types=None,
+             gamma=None, gpu_id=None, grow_policy=None, importance_type=None,
+             interaction_constraints=None, learning_rate=None, max_bin=None,
+             max_cat_threshold=None, max_cat_to_onehot=None,
+             max_delta_step=None, max_depth=None, max_leaves=None,
+             min_child_weight=None, missing=nan, monotone_constraints=None,
+             n_estimators=100, n_jobs=None, num_parallel_tree=None,
+             objective=&#x27;binary:logistic&#x27;, predictor=None, ...)</pre></div></div></div><div class="sk-serial"><div class="sk-item"><div class="sk-estimator sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-18" type="checkbox" ><label for="sk-estimator-id-18" class="sk-toggleable__label sk-toggleable__label-arrow">XGBRegressor</label><div class="sk-toggleable__content"><pre>XGBRegressor(base_score=None, booster=None, callbacks=None,
+             colsample_bylevel=None, colsample_bynode=None,
+             colsample_bytree=None, early_stopping_rounds=None,
+             enable_categorical=False, eval_metric=None, feature_types=None,
+             gamma=None, gpu_id=None, grow_policy=None, importance_type=None,
+             interaction_constraints=None, learning_rate=None, max_bin=None,
+             max_cat_threshold=None, max_cat_to_onehot=None,
+             max_delta_step=None, max_depth=None, max_leaves=None,
+             min_child_weight=None, missing=nan, monotone_constraints=None,
+             n_estimators=100, n_jobs=None, num_parallel_tree=None,
+             objective=&#x27;binary:logistic&#x27;, predictor=None, ...)</pre></div></div></div></div></div></div></div></div></div></div>
+<div class="sourceCode" id="cb31"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>tock <span class="op">=</span> time.time()</span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">&quot;Fit complete&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb32"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f&quot;Time Taken: </span><span class="sc">{</span><span class="bu">round</span>((tock<span class="op">-</span>tick)<span class="op">/</span><span class="dv">60</span>,<span class="dv">2</span>)<span class="sc">}</span><span class="ss"> minutes&quot;</span>)</span></code></pre></div>
+<p>With the grid search complete, we will take the best outcome and store it as our final model, as well as
+look at the hyperparameters that were selected.</p>
+<div class="sourceCode" id="cb33"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Take best model from grid search</span></span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>final_model <span class="op">=</span> clf.best_estimator_</span></code></pre></div>
+<div class="sourceCode" id="cb34"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="co">#View parameters of the selected model</span></span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>final_model.get_params()</span></code></pre></div>
+<pre><code>## {&#39;objective&#39;: &#39;binary:logistic&#39;, &#39;base_score&#39;: 0.5, &#39;booster&#39;: &#39;gbtree&#39;, &#39;callbacks&#39;: None, &#39;colsample_bylevel&#39;: 1, &#39;colsample_bynode&#39;: 1, &#39;colsample_bytree&#39;: 1, &#39;early_stopping_rounds&#39;: None, &#39;enable_categorical&#39;: False, &#39;eval_metric&#39;: None, &#39;feature_types&#39;: None, &#39;gamma&#39;: 0, &#39;gpu_id&#39;: -1, &#39;grow_policy&#39;: &#39;depthwise&#39;, &#39;importance_type&#39;: None, &#39;interaction_constraints&#39;: &#39;&#39;, &#39;learning_rate&#39;: 0.300000012, &#39;max_bin&#39;: 256, &#39;max_cat_threshold&#39;: 64, &#39;max_cat_to_onehot&#39;: 4, &#39;max_delta_step&#39;: 0, &#39;max_depth&#39;: 20, &#39;max_leaves&#39;: 0, &#39;min_child_weight&#39;: 1, &#39;missing&#39;: nan, &#39;monotone_constraints&#39;: &#39;()&#39;, &#39;n_estimators&#39;: 200, &#39;n_jobs&#39;: 0, &#39;num_parallel_tree&#39;: 1, &#39;predictor&#39;: &#39;auto&#39;, &#39;random_state&#39;: 0, &#39;reg_alpha&#39;: 0, &#39;reg_lambda&#39;: 1, &#39;sampling_method&#39;: &#39;uniform&#39;, &#39;scale_pos_weight&#39;: 1, &#39;subsample&#39;: 1, &#39;tree_method&#39;: &#39;exact&#39;, &#39;validate_parameters&#39;: 1, &#39;verbosity&#39;: None, &#39;min_samples_split&#39;: 5}</code></pre>
+<p><strong>Model Assessment</strong></p>
+<p>With our final model set, let’s see how it did on our validation dataset by plotting the area under the ROC curve.</p>
+<pre><code>## (0.0, 1.0)</code></pre>
+<pre><code>## (0.0, 1.0)</code></pre>
+<p><img src="bookdownproj_files/figure-html/unnamed-chunk-37-9.png" width="768" /></p>
+<p>With an AUROC value of <em>.98</em>, we can feel confident that our model did a solid job at distinguishing
+our All-Stars from the non All-Stars.</p>
+<p><strong>Variable Importance</strong></p>
+<p>Let’s now take a look at which variables had the biggest impact on our model’s predictions. We will limit this
+to the top 10 most impactful predictors.</p>
+<p><img src="bookdownproj_files/figure-html/unnamed-chunk-39-11.png" width="768" /></p>
+<p>Unsurprisingly, points per game was by far the most important variable to our model’s predictions. Intuitively,
+seeing field goals made per game following it in second place makes sense as well, as the variables would be
+highly correlated (more made shots = more points).</p>
+</div>
+<div id="results" class="section level2 hasAnchor" number="1.5">
+<h2><span class="header-section-number">1.5</span> Results<a href="#results" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p><strong>Predictions</strong></p>
+<p>Now we are ready to see what predicted probabilities our model assigns to our current players. We will split
+the test set by East and West Conference players, then rank them by All-Star probability.</p>
+<p>First, our top Eastern All-Star Candidates:</p>
+<pre><code>##                     Player         Pos  All-Star Probability
+## 630           Jayson Tatum  Frontcourt              0.999165
+## 200            Joel Embiid  Frontcourt              0.998936
+## 19   Giannis Antetokounmpo  Frontcourt              0.997491
+## 85            Jaylen Brown       Guard              0.927927
+## 699             Trae Young       Guard              0.777516
+## 575       Domantas Sabonis  Frontcourt              0.772665
+## 104           Jimmy Butler  Frontcourt              0.170591
+## 102           Jimmy Butler  Frontcourt              0.170591
+## 64        Bojan Bogdanović  Frontcourt              0.153535
+## 432        Lauri Markkanen  Frontcourt              0.085584
+## 597          Pascal Siakam  Frontcourt              0.035210
+## 411             Kyle Lowry       Guard              0.023656
+## 324           Kyrie Irving       Guard              0.021998
+## 521        Kelly Oubre Jr.  Frontcourt              0.010728
+## 520        Kelly Oubre Jr.  Frontcourt              0.010728</code></pre>
+<p>Next, for the Western Conference.</p>
+<pre><code>##                       Player         Pos  All-Star Probability
+## 181              Luka Dončić       Guard              0.999909
+## 191             Kevin Durant  Frontcourt              0.999696
+## 161            Anthony Davis  Frontcourt              0.999656
+## 159            Stephen Curry       Guard              0.998754
+## 246  Shai Gilgeous-Alexander       Guard              0.997617
+## 335             LeBron James  Frontcourt              0.992093
+## 356             Nikola Jokić  Frontcourt              0.990028
+## 469         Donovan Mitchell       Guard              0.964376
+## 68              Devin Booker       Guard              0.963103
+## 174            DeMar DeRozan       Guard              0.931248
+## 401           Damian Lillard       Guard              0.882354
+## 270             James Harden       Guard              0.829841
+## 103             Jimmy Butler       Guard              0.170591
+## 555            Julius Randle  Frontcourt              0.058978
+## 675        Russell Westbrook       Guard              0.039078</code></pre>
+<p>Now, there are a few initial reactions I have to these results. First, the model has done a great job at being
+near certain that the most elite players of the league will be All-Stars. Stephen Curry, Kevin Durant, Jayson Tatum
+are all players who find themselves consistently in the conversation for Most Valuable Player, and are near locks
+to be an All-Star each and every season. Our model was able to identify top performers such as them, giving them
+over a 99% probability of making the All-Star team.</p>
+<p>What I find most interesting is how quickly the predicted probabilities drop off after you get past the elite.
+For example, in our Eastern Conference table, after Domantas Sabonis (80% probability), the next highest drops to
+Zion Williamson at just over 30%. In fact, even the 15th highest probability in the conference, Jerami Grant, has
+only a 4.4% chance to make it. This is telling that our model is generally going to assign incredibly high or
+low probabilities to players. I believe that through these results, we can segment the league into three rough
+categories:
+- Elite All-Star (Top 15 player)
+- Fringe All-Star (16-35th best player)
+- Rest of league (36th and lower)</p>
+<p>Your top players are going to be clear standouts to make the cut with little to no debate. These should be obvious even to
+the casual fan. However, there are likely a good 20 or so players who have above average stats, but do not stand out as elite.
+Players of this type are much more common than the elite, however only have roughly 5 All-Star spots per conference to fill.
+Because of this, the individual probabilty of this type of player making the All-Star game is likely much lower, explaining
+the significant drop-off in probabilities in both conferences. Based on the model output, I would suspect that any player
+with above a 1% chance of making the All-Star game is likely a top 50 player across the league, despite how low this value
+sounds.</p>
+<p><strong>Limitations</strong></p>
+<p>While generally pleased with the model results, there are a few areas of limitation I would like to address.</p>
+<p>First, the selection criteria. While this model is making it’s predictions from an objective, statistical standpoint, this
+is not how it is selected in practice. As mentioned in the background section, All-Stars are selected via a mix of fan,
+player, media, and coach votes. Subjectivity, especially for super-fans who spend hours submitting numerous votes for their
+favorite players, can cause some skew in the results. This may also apply to the players and coaches who may hold some
+implicit bias towards their own teammates or friends in the league. Since voting procedures have changed over the years,
+it would be incredibly challenging to feature engineer this into the dataset for improved predictions.</p>
+<p>Another area of concern is the rare occasion in which an NBA legend is retiring. Generally, as shown over the years,
+well-loved and celebrated players are selected for the All-Star game, despite their stats not showing them as a standout.
+An example of this that was mentioned earlier is Dirk Nowitzki being selected as an All-Star in 2018-19. While only playing
+15 minutes per game, and averaging less than 8 points per game, Dirk still made the roster. Similar with Kobe Bryant (
+17 points per game on 35% shooting) and Dwyane Wade (15 points per game) in 2016 and 2018 respectively, this act of respect
+to an outgoing legend does serve as an outlier. While infrequent, the model takes all instances of an All-Star selection
+into account without this consideration without this added context.</p>
+<p><strong>Next Steps</strong></p>
+<p>I thoroughly enjoyed working on this project, and am greatly pleased with the results of the models predictive power. With
+that being said, the fun part has yet to come. At the time of this writing (Dec. 2022), I am planning to update the model’s
+predictions two times between now and February, just before the All-Star rosters are officially announced. I hope to store
+the predictions from each time point to track and compare which players are the biggest risers and fallers as the season
+continues and more data rolls in. Come February, I hope to present a final All-Star roster prediction, which I will assess
+the accuracy of following the announcements.</p>
 
 </div>
 </div>

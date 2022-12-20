@@ -1,3 +1,6 @@
 nba-all-star-predictions
 introduction
 methodologydata-prep
+exploratory-data-analysis-eda
+modeling
+results

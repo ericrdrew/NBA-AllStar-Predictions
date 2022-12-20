@@ -21,11 +21,11 @@ Each season in February, 24 of the NBA's top performing players are selected as 
 *   Six frontcourt players (Small Forward, Power Forward, Center)
 *   Two additional players regardless of position
 
-Starting lineups are selected by a combination of fan, current player, and media votes, while the reserve players are selected by the league's 30 head coaches. Injured players will be replaced by a player selected by the league's Commissioner, Adam Silver [1].
+Starting lineups are selected by a combination of fan, current player, and media votes, while the reserve players are selected by the league's 30 head coaches. Injured players will be replaced by a player selected by the league's Commissioner, Adam Silver.
 
 **Data**
 
-The model will be built off of player's "per game" statistics from the 2003-04 to 2021-22 seasons, accessed from the public sports database Basketball-Reference [2]. Player statistics from the current season, which is only ~30 games in at the time of writing, will be used as our test dataset. My goal is to update my predictions in January and again in February just before the rosters are announced, allowing me to assess my models predictive power in real-time. While the model will not change during this time period, new data will be available as players continue to complete more games in the coming months.  
+The model will be built off of player's "per game" statistics from the 2003-04 to 2021-22 seasons, accessed from the public sports database Basketball-Reference. Player statistics from the current season, which is only ~30 games in at the time of writing, will be used as our test dataset. My goal is to update my predictions in January and again in February just before the rosters are announced, allowing me to assess my models predictive power in real-time. While the model will not change during this time period, new data will be available as players continue to complete more games in the coming months.  
 
 ## Methodology/Data Prep
 I will be utilizing a combination of common and advanced Python libraries to complete the project. The following code is living and may be adapted as the project continues. 
@@ -78,7 +78,7 @@ There were a handful of things that needed to be done to the datasets before I c
 
 **Scaling by Season**
 
-The NBA is an incredibly dynamic league and has changed greatly over the last decades. For example, the average points scored by a team per game has fluctuated a good bit just in the time horizon we are concerned with in this project, with a high of 112.1 PPG in 2020-21 and low of 93.4 PPG in 2003-04, a difference of nearly 20 points per game [3]. Because of changes like these, it is difficult to compare raw statistics between players across seasons, especially those over a decade apart. For example, a player scoring 20 PPG in 2003 was likely more impactful than a 20 PPG scorer in 2020, and in the context of our project's scope, may be the difference between an All-Star or not. The question of whether a player is an All-Star is likely not as simple as "how many points per game do they score?", but "how does their scoring average compare to the rest of the league?"
+The NBA is an incredibly dynamic league and has changed greatly over the last decades. For example, the average points scored by a team per game has fluctuated a good bit just in the time horizon we are concerned with in this project, with a high of 112.1 PPG in 2020-21 and low of 93.4 PPG in 2003-04, a difference of nearly 20 points per game. Because of changes like these, it is difficult to compare raw statistics between players across seasons, especially those over a decade apart. For example, a player scoring 20 PPG in 2003 was likely more impactful than a 20 PPG scorer in 2020, and in the context of our project's scope, may be the difference between an All-Star or not. The question of whether a player is an All-Star is likely not as simple as "how many points per game do they score?", but "how does their scoring average compare to the rest of the league?"
 
 
 To combat this challenge, I scaled each season's data individually using Z-scores, allowing us to measure how strong a player's stat line was compared to the league *that season*. We then will be able to compare players across time by how much they stood out across a distribution, regardless of the season they played in. 
@@ -100,7 +100,10 @@ df = df.sort_values(['Player','G'], ascending = [True, False])
 df = df.drop_duplicates(subset=['Player'], keep='first')
 ```
 
-Another concern was the data being too imbalanced for a model to find meaningful signal in. Most NBA seasons see over 450 individual players log minutes in at least one game. Left as this, the league would contain roughly ~5% All-Stars, crossing into rare-event territory. Seeing as players who rarely see the court are not going to be in contention for making the All-Star roster as is, I decided to subset our data to retain only players who played *at least* 15 minutes per 48 minute game. This was in an attempt to reduce the noise caused by an overwhelming amount of players who only enter games for a handful of minutes per game at best, who's statistics would intuitively not bring any predictive power in separating All-Stars versus those who are not. 
+Another concern was the data being too imbalanced for a model to find meaningful signal in. Most NBA seasons see over 450 individual players log minutes in at least one game. Left as this, the league would contain roughly ~5% All-Stars, crossing into rare-event territory. Seeing as players who rarely see the court are not going to be in contention for making the All-Star roster as is, I decided to subset our data to retain only players who played *at least* 15 minutes per 48 minute game. This was in an attempt to reduce the noise caused by an overwhelming amount of players who only enter games for a handful of minutes per game at best, who's statistics would intuitively not bring any predictive power in separating All-Stars versus those who are not. Another point of note
+is that across NBA history, the All-Star who played the least minutes per game was Dirk Nowitzki in 2018-19. Since
+no other NBA player in history has made an All-Star game without playing at least 15 minutes per game, I deemed
+this a useful cutoff for players that would be deemed up for contention to be an All-Star.
 
 ```
 df = df[df['MP'] >= 15]
@@ -265,7 +268,7 @@ s21['AllStar'] = np.where(np.isin(s21['Player'],ASG21), 1, 0)
 ```
 s03['AllStar'] = np.where(np.isin(s03['Player'],ASG03), 1, 0)
 ```
-```{python, echo=F}
+```{python, echo=F, results='hide'}
 #Make sure all the all stars were labeled properly
 s05.AllStar.value_counts()
 ```
@@ -277,7 +280,7 @@ Now that each of the individual datasets have been properly manipulated with the
 dfList = [s03,s04,s05,s06,s07,s08,s09,s10,s11,s12,s13,s14,s15,s16,s17,s18,s19,s20,s21]
 #Concatenate the training seasons
 train = pd.concat(dfList)
-````
+```
 
 Quickly we will check the distribution of All-Stars(1) in our overall training set.
 ```{python}
@@ -313,7 +316,7 @@ train.Pos.value_counts()
 #Combine Guard/Front-Court positions
 train['Pos'] = np.where(((train['Pos'].eq('PG')) | (train['Pos'].eq('SG')) | (train['Pos'].eq('PG-SG')) |(train['Pos'].eq('SG-PG')) |
                          (train['Pos'].eq('SG-PF'))|
-    (train['Pos'].eq('SG-PG-SF'))),'Guard','FrontCourt')
+    (train['Pos'].eq('SG-PG-SF'))),'Guard','Frontcourt')
 ```
 
 Tree based models like an XGBoost generally do not do well handling categorical variables. For this
@@ -401,3 +404,299 @@ test[s] = test[s].astype("float")
 ```
 
 ## Exploratory Data Analysis (EDA)
+
+Now it was time to look at a few of our variables at a closer level. Intuitively we can expect that All-Stars 
+generally have better stats than the average player, it is also important to remember that minutes played per game
+likely plays a large role in statistics as well. Let's take a look at some of these variables visually.
+
+
+First let's see how minutes and points correlate. 
+```{python, echo=F}
+plt.scatter(x=train['remainder__MP'], y=train['remainder__PTS'])
+plt.title('Scatterplot of Minutes/Game vs. Points/Game')
+plt.xlabel('Minutes/Game (Scaled)')
+plt.ylabel('Points/Game (Scaled)')
+```
+As we can see, there is a pretty clear positive, linear relationship between the variables. However, one thing 
+to note is how after the scaled minutes per game value exceeds 1, the points per game values seem to increase at a
+slightly steeper rate. This could be, as previously mentioned, the fact that the best players play the most 
+minutes, and are also the ones scoring the most points. 
+
+
+
+Next we will take a look at how points per game looks across our All-Stars versus non All-Stars. 
+```{python}
+sns.boxplot(x = train['remainder__AllStar'],
+            y = train['remainder__PTS'])
+plt.title('Boxplot of Points/Game by All-Star Status')
+plt.xlabel('All-Star Status')
+plt.ylabel('Points/Game (Scaled)')
+```
+Unsurprisingly, All-Stars are generally scoring at a much more standout level compared to their peers. In fact, 
+the median scoring value for an All-Star is about 2 standard deviations from league standard, which encompasses
+roughly the top 5% of scorers in the league. It is also noted that there were outliers for All-Stars that scored
+below the league standard. 
+
+
+
+Next, let's take a look at how field goal % compares across All-Star status.
+```{python, echo=F}
+sns.boxplot(x = train['remainder__AllStar'],
+            y = train['remainder__FG%'])
+plt.title('Boxplot of Field Goal % by All-Star Status')
+plt.xlabel('All-Star Status')
+plt.ylabel('FG % (Scaled)')
+```
+
+Interesting to see how the medians across both groups are roughly at 0, or league standard. However, the most 
+notable observation here is how the spread of the non All-Stars is vastly larger than the All-Stars, stretching
+down as far as nearly 8 standard deviations below the mean.
+
+
+
+Lastly, let's take a look at a correlation matrix across all of our variables.
+```{python, echo=F}
+corr_matrix = train.corr()
+sns.heatmap(corr_matrix, annot=False)
+plt.title('Correlation Matrix')
+```
+While a bit difficult to interpret easily, there are a few interesting takeaways. First, Field Goal % seems to
+have a strong, negative correlation with some of the other shooting statistics. This may represent players who 
+take very few shots, but make them at a high clip, leaving them with high shooting percentages with low attempts.
+We also see that the age variable seems to have no notable correlations with any other variable. I would have 
+expected to see stats, especially percentages, drop as a player ages, but evidently this is not as glaring of
+a trend as I thought.
+
+
+## Modeling
+
+Now that our training/test datasets are prepared and we have explored our data, it is time to set up our modeling
+procedure. 
+
+**Data Split**
+
+
+First, we will create our X and Y objects. The X object will contain only our predictor variables, while the Y
+object will be a list containing the values of the target variable.
+```{python}
+#Create X and Y object for data split function
+X = train.drop(['remainder__AllStar'],axis=1)
+Y = train['remainder__AllStar'].values
+```
+
+Since we do not have the All-Star values for our test set at the time of this writing, I chose to split our training
+set into a training and validation set. The true training set will be used to build the model on, with the 
+validation set being used for model assessment. The code to split these datasets is shown below.
+
+```{python}
+#data split
+X_train, X_valid, Y_train, Y_valid = train_test_split(X, Y, test_size = .2, stratify=Y, random_state=20)
+```
+
+**Model Fitting**
+
+
+Next, I will establish our XGBoost regressor object.
+```{python}
+#Establish XGB regressor
+xgb_model = xgb.XGBRegressor(objective="binary:logistic", random_state=0)
+```
+
+Cross-validation is a key technique to apply in model building to help avoid over-fitting on the training set. For
+our model, I will use 10-fold cross-validation, repeated 3 times. 
+```{python}
+#Set CV params
+cv = RepeatedStratifiedKFold(n_splits = 10, n_repeats = 3, random_state=0)
+```
+
+I decided to utilize a small grid search across tuning hyperparameters for the model. This allows us to try out
+many combinations of key aspects of an XGBoost such as the depth of the trees and number of trees in the forest. 
+```{python}
+#Establish tuning parameters
+params = {
+    "max_depth":[10,15,20],
+    "n_estimators":[200,400,600],
+    "min_samples_split":[5,10]
+}
+```
+
+Next, I set our grid search object with the tuning parameters and cross-validation specifics. I chose area under
+the ROC curve (AUROC) to serve as our cross-validation metric.
+```{python}
+#Set gridsearch object. Use ROC as our CV measure
+clf = GridSearchCV(xgb_model, params, cv=cv, scoring='roc_auc')
+```
+
+Now it is time to run the model.
+```{python, results='hide'}
+#Fit model
+tick = time.time()
+clf.fit(X_train,Y_train)
+tock = time.time()
+
+print("Fit complete")
+print(f"Time Taken: {round((tock-tick)/60,2)} minutes")
+```
+
+With the grid search complete, we will take the best outcome and store it as our final model, as well as 
+look at the hyperparameters that were selected. 
+```{python}
+#Take best model from grid search
+final_model = clf.best_estimator_
+```
+
+```{python}
+#View parameters of the selected model
+final_model.get_params()
+```
+
+**Model Assessment**
+
+With our final model set, let's see how it did on our validation dataset by plotting the area under the ROC curve.
+```{python, echo=F}
+#Store predictions on validation set
+Y_pred = final_model.predict(X_valid)
+```
+
+```{python, echo=F}
+#Find metrics via roc curve function
+fpr, tpr, thresh = roc_curve(Y_valid, Y_pred)
+```
+
+```{python, echo=F, results='hide'}
+#Numerically view area under ROC score
+auc(fpr,tpr)
+```
+
+```{python, echo=F}
+#Plot ROC Curve
+plt.figure(figsize=(8,4))
+plt.plot(fpr,tpr, lw=2, color='red')
+plt.xlim([0,1])
+plt.ylim([0,1])
+plt.xlabel("FPR")
+plt.ylabel("TPR")
+plt.title("ROC Curve for XGBoost", size=14)
+plt.text(s=f'{round(auc(fpr,tpr),2)}', x=.5, y=.5)
+plt.fill_between(fpr,tpr, alpha=0.2)
+```
+
+With an AUROC value of *.98*, we can feel confident that our model did a solid job at distinguishing
+our All-Stars from the non All-Stars. 
+
+**Variable Importance**
+
+Let's now take a look at which variables had the biggest impact on our model's predictions. We will limit this
+to the top 10 most impactful predictors.
+
+```{python, echo=F}
+#Pull variable importance from the model output, rank by most important
+importance = pd.DataFrame(final_model.feature_importances_, index=list(X_train.columns))
+importance.columns = ['importance']
+importance.sort_values(by='importance', ascending=False, inplace=True)
+```
+
+```{python, echo=F}
+#plot importance
+sns.barplot(x='importance', y=importance.index, data=importance, order=importance.index[:10])
+plt.title('Top 10 Most Important Variables')
+plt.xlabel('Importance Score')
+```
+
+Unsurprisingly, points per game was by far the most important variable to our model's predictions. Intuitively,
+seeing field goals made per game following it in second place makes sense as well, as the variables would be 
+highly correlated (more made shots = more points). 
+
+## Results
+```{python, echo=F}
+#Store test predictions
+Y_pred_test = final_model.predict(test)
+resultsList = {'Player':playernames, 'All-Star Probability':Y_pred_test}
+results = pd.DataFrame(resultsList)
+
+#merge probabilities on to original '22-'23 dataset with 
+final = pd.read_csv('C:/Users/ericd/OneDrive - North Carolina State University/Desktop/NBA-AllStar-Predictions/Data/season18-19.csv')
+s19 = pd.read_csv('C:/Users/ericd/OneDrive - North Carolina State University/Desktop/NBA-AllStar-Predictions/Data/season22-23.csv')
+final = final.merge(results, on='Player',how='left')
+
+#Position grouping
+final['Pos'] = np.where((final['Pos'].eq('PG')) | (final['Pos'].eq('SG')),'Guard','Frontcourt')
+
+#Conference Grouping
+west = ['MEM','NOP','DEN','PHO','POR','SAC','UTA','LAC','DAL','GSW','MIN','LAL','OKC','SAS','HOU']
+final['Conference'] = np.where(np.isin(final['Tm'],west), 'West', 'East')
+
+#Sort by descending ASG probability
+final = final.sort_values(by='All-Star Probability', ascending=False)
+```
+
+**Predictions**
+
+Now we are ready to see what predicted probabilities our model assigns to our current players. We will split
+the test set by East and West Conference players, then rank them by All-Star probability.
+
+First, our top Eastern All-Star Candidates:
+```{python, echo=F}
+#East All-Stars
+final[final['Conference'] == 'East'].head(15)[['Player','Pos','All-Star Probability']]
+```
+Next, for the Western Conference.
+```{python, echo=F}
+#East All-Stars
+final[final['Conference'] == 'West'].head(15)[['Player','Pos','All-Star Probability']]
+```
+
+Now, there are a few initial reactions I have to these results. First, the model has done a great job at being
+near certain that the most elite players of the league will be All-Stars. Stephen Curry, Kevin Durant, Jayson Tatum
+are all players who find themselves consistently in the conversation for Most Valuable Player, and are near locks
+to be an All-Star each and every season. Our model was able to identify top performers such as them, giving them
+over a 99% probability of making the All-Star team.
+
+What I find most interesting is how quickly the predicted probabilities drop off after you get past the elite.
+For example, in our Eastern Conference table, after Domantas Sabonis (80% probability), the next highest drops to 
+Zion Williamson at just over 30%. In fact, even the 15th highest probability in the conference, Jerami Grant, has
+only a 4.4% chance to make it. This is telling that our model is generally going to assign incredibly high or 
+low probabilities to players. I believe that through these results, we can segment the league into three rough
+categories:
+- Elite All-Star (Top 15 player)
+- Fringe All-Star (16-35th best player)
+- Rest of league (36th and lower)
+
+Your top players are going to be clear standouts to make the cut with little to no debate. These should be obvious even to
+the casual fan. However, there are likely a good 20 or so players who have above average stats, but do not stand out as elite. 
+Players of this type are much more common than the elite, however only have roughly 5 All-Star spots per conference to fill.
+Because of this, the individual probabilty of this type of player making the All-Star game is likely much lower, explaining
+the significant drop-off in probabilities in both conferences. Based on the model output, I would suspect that any player 
+with above a 1% chance of making the All-Star game is likely a top 50 player across the league, despite how low this value
+sounds. 
+
+
+**Limitations**
+
+While generally pleased with the model results, there are a few areas of limitation I would like to address.
+
+First, the selection criteria. While this model is making it's predictions from an objective, statistical standpoint, this
+is not how it is selected in practice. As mentioned in the background section, All-Stars are selected via a mix of fan,
+player, media, and coach votes. Subjectivity, especially for super-fans who spend hours submitting numerous votes for their
+favorite players, can cause some skew in the results. This may also apply to the players and coaches who may hold some
+implicit bias towards their own teammates or friends in the league. Since voting procedures have changed over the years,
+it would be incredibly challenging to feature engineer this into the dataset for improved predictions.
+
+Another area of concern is the rare occasion in which an NBA legend is retiring. Generally, as shown over the years, 
+well-loved and celebrated players are selected for the All-Star game, despite their stats not showing them as a standout.
+An example of this that was mentioned earlier is Dirk Nowitzki being selected as an All-Star in 2018-19. While only playing
+15 minutes per game, and averaging less than 8 points per game, Dirk still made the roster. Similar with Kobe Bryant (
+17 points per game on 35% shooting) and Dwyane Wade (15 points per game) in 2016 and 2018 respectively, this act of respect
+to an outgoing legend does serve as an outlier. While infrequent, the model takes all instances of an All-Star selection
+into account without this consideration without this added context. 
+
+
+**Next Steps**
+
+I thoroughly enjoyed working on this project, and am greatly pleased with the results of the models predictive power. With
+that being said, the fun part has yet to come. At the time of this writing (Dec. 2022), I am planning to update the model's
+predictions two times between now and February, just before the All-Star rosters are officially announced. I hope to store
+the predictions from each time point to track and compare which players are the biggest risers and fallers as the season
+continues and more data rolls in. Come February, I hope to present a final All-Star roster prediction, which I will assess
+the accuracy of following the announcements. 
+
