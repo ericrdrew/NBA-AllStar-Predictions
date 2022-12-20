@@ -125,37 +125,37 @@ dfList = [s03,s04,s05,s06,s07,s08,s09,s10,s11,s12,s13,s14,s15,s16,s17,s18,s19,s2
 ```{python}
 #cleaning function removing TOTs, keep to players >=15MPG, scale continuous variables, remove special characters on name
 def trainPrep(df):
-    df = df.drop(['Rk','Player-additional','Tm'], axis=1)
-    df = df.sort_values(['Player','G'], ascending = [True, False])
-    df = df.drop_duplicates(subset=['Player'], keep='first')
-    df = df[df['MP'] >= 15]
-    df['Age'] = zscore(df['Age'])
-    df['G'] = zscore(df['G'])
-    df['GS'] = zscore(df['GS'])
-    df['MP'] = zscore(df['MP'])
-    df['FG'] = zscore(df['FG'])
-    df['FGA'] = zscore(df['FGA'])
-    df['FG%'] = zscore(df['FG%'])
-    df['3P'] = zscore(df['3P'])
-    df['3PA'] = zscore(df['3PA'])
-    df['2P'] = zscore(df['2P'])
-    df['2PA'] = zscore(df['2PA'])
-    df['2P%'] = zscore(df['2P%'])
-    df['eFG%'] = zscore(df['eFG%'])
-    df['FT'] = zscore(df['FT'])
-    df['FTA'] = zscore(df['FTA'])
-    df['FT%'] = zscore(df['FT%'])
-    df['ORB'] = zscore(df['ORB'])
-    df['DRB'] = zscore(df['DRB'])
-    df['TRB'] = zscore(df['TRB'])
-    df['AST'] = zscore(df['AST'])
-    df['STL'] = zscore(df['STL'])
-    df['BLK'] = zscore(df['BLK'])
-    df['TOV'] = zscore(df['TOV'])
-    df['PF'] = zscore(df['PF'])
-    df['PTS'] = zscore(df['PTS'])
-    df['Player'] = df['Player'].str.replace('\W', '', regex=True)
-    return df
+  df = df.drop(['Rk','Player-additional','Tm'], axis=1)
+  df = df.sort_values(['Player','G'], ascending = [True, False])
+  df = df.drop_duplicates(subset=['Player'], keep='first')
+  df = df[df['MP'] >= 15]
+  df['Age'] = zscore(df['Age'])
+  df['G'] = zscore(df['G'])
+  df['GS'] = zscore(df['GS'])
+  df['MP'] = zscore(df['MP'])
+  df['FG'] = zscore(df['FG'])
+  df['FGA'] = zscore(df['FGA'])
+  df['FG%'] = zscore(df['FG%'])
+  df['3P'] = zscore(df['3P'])
+  df['3PA'] = zscore(df['3PA'])
+  df['2P'] = zscore(df['2P'])
+  df['2PA'] = zscore(df['2PA'])
+  df['2P%'] = zscore(df['2P%'])
+  df['eFG%'] = zscore(df['eFG%'])
+  df['FT'] = zscore(df['FT'])
+  df['FTA'] = zscore(df['FTA'])
+  df['FT%'] = zscore(df['FT%'])
+  df['ORB'] = zscore(df['ORB'])
+  df['DRB'] = zscore(df['DRB'])
+  df['TRB'] = zscore(df['TRB'])
+  df['AST'] = zscore(df['AST'])
+  df['STL'] = zscore(df['STL'])
+  df['BLK'] = zscore(df['BLK'])
+  df['TOV'] = zscore(df['TOV'])
+  df['PF'] = zscore(df['PF'])
+  df['PTS'] = zscore(df['PTS'])
+  df['Player']=df['Player'].str.replace("\\W",'',regex=True)
+  return df
 ```
 
 ```{python}
@@ -270,7 +270,7 @@ s03['AllStar'] = np.where(np.isin(s03['Player'],ASG03), 1, 0)
 ```
 ```{python, echo=F, results='hide'}
 #Make sure all the all stars were labeled properly
-s05.AllStar.value_counts()
+s06.AllStar.value_counts()
 ```
 
 Now that each of the individual datasets have been properly manipulated with the target variable added, we can concatenate them together to form our training dataset.
@@ -615,8 +615,8 @@ resultsList = {'Player':playernames, 'All-Star Probability':Y_pred_test}
 results = pd.DataFrame(resultsList)
 
 #merge probabilities on to original '22-'23 dataset with 
-final = pd.read_csv('C:/Users/ericd/OneDrive - North Carolina State University/Desktop/NBA-AllStar-Predictions/Data/season18-19.csv')
-s19 = pd.read_csv('C:/Users/ericd/OneDrive - North Carolina State University/Desktop/NBA-AllStar-Predictions/Data/season22-23.csv')
+final = pd.read_csv('C:/Users/ericd/OneDrive - North Carolina State University/Desktop/NBA-AllStar-Predictions/Data/season22-23.csv')
+
 final = final.merge(results, on='Player',how='left')
 
 #Position grouping
