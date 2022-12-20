@@ -5,4 +5,4 @@ edit: https://github.com/ericrdrew/NBA-AllStar-Predictions/edit/master/%s
 view: https://github.com/ericrdrew/NBA-AllStar-Predictions/blob/master/%s
 language:
   ui:
-    chapter_name: "Chapter "
+    chapter_name: ""
