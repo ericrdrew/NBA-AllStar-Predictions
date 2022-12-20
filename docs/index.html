@@ -417,8 +417,8 @@ below the league standard.</p>
 notable observation here is how the spread of the non-All-Stars is vastly larger than the All-Stars, stretching
 down as far as nearly 8 standard deviations below the mean.</p>
 <p>Lastly, let’s look at a correlation matrix across all of our variables.
-<img src="bookdownproj_files/figure-html/unnamed-chunk-24-7.png" width="672" />
-While a bit difficult to interpret easily, there are a few interesting takeaways. First, Field Goal % seems to
+<img src="bookdownproj_files/figure-html/unnamed-chunk-24-7.png" width="672" /></p>
+<p>While a bit difficult to interpret easily, there are a few interesting takeaways. First, Field Goal % seems to
 have a strong, negative correlation with other shooting statistics. This may represent players who
 take very few shots, but make them at a high clip, leaving them with high shooting percentages with low attempts.
 We also see that the age variable seems to have no notable correlations with any other variable. I would have
@@ -545,6 +545,7 @@ our All-Stars from the non All-Stars.</p>
 <p>Let’s now look at which variables had the biggest impact on our model’s predictions. We will limit this
 to the top 10 most impactful predictors.</p>
 <pre><code>## (array([0, 1, 2, 3, 4, 5, 6, 7, 8, 9]), [Text(0, 0, &#39;remainder__PTS&#39;), Text(0, 1, &#39;remainder__FG&#39;), Text(0, 2, &#39;remainder__MP&#39;), Text(0, 3, &#39;remainder__AST&#39;), Text(0, 4, &#39;remainder__DRB&#39;), Text(0, 5, &#39;remainder__GS&#39;), Text(0, 6, &#39;remainder__TRB&#39;), Text(0, 7, &#39;remainder__Age&#39;), Text(0, 8, &#39;remainder__FGA&#39;), Text(0, 9, &#39;remainder__G&#39;)])</code></pre>
+<pre><code>## (array([0.  , 0.05, 0.1 , 0.15, 0.2 , 0.25, 0.3 , 0.35, 0.4 ]), [Text(0, 0, &#39;&#39;), Text(0, 0, &#39;&#39;), Text(0, 0, &#39;&#39;), Text(0, 0, &#39;&#39;), Text(0, 0, &#39;&#39;), Text(0, 0, &#39;&#39;), Text(0, 0, &#39;&#39;), Text(0, 0, &#39;&#39;), Text(0, 0, &#39;&#39;)])</code></pre>
 <p>Unsurprisingly, points per game was by far the most important variable to our model’s predictions. Intuitively,
 seeing field goals made per game following it in second place makes sense as well, as the variables would be
 highly correlated (more made shots = more points).</p>

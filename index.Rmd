@@ -420,6 +420,7 @@ plt.title('Scatterplot of Minutes/Game vs. Points/Game')
 plt.xlabel('Minutes/Game (Scaled)')
 plt.ylabel('Points/Game (Scaled)')
 ```
+
 As we can see, there is a pretty clear positive, linear relationship between the variables. However, one thing 
 to note is how after the scaled minutes per game value exceeds 1, the points per game values seem to increase at a
 slightly steeper rate. This could be, as previously mentioned, the fact that the best players play the most 
@@ -463,6 +464,7 @@ corr_matrix = train.corr()
 sns.heatmap(corr_matrix, annot=False)
 plt.title('Correlation Matrix')
 ```
+
 While a bit difficult to interpret easily, there are a few interesting takeaways. First, Field Goal % seems to
 have a strong, negative correlation with other shooting statistics. This may represent players who 
 take very few shots, but make them at a high clip, leaving them with high shooting percentages with low attempts.
@@ -604,7 +606,8 @@ importance.sort_values(by='importance', ascending=False, inplace=True)
 sns.barplot(x='importance', y=importance.index, data=importance, order=importance.index[:10])
 plt.title('Top 10 Most Important Variables')
 plt.xlabel('Importance Score')
-plt.yticks(size=7)
+plt.yticks(size=3)
+plt.xticks(size=3)
 ```
 
 Unsurprisingly, points per game was by far the most important variable to our model's predictions. Intuitively,
