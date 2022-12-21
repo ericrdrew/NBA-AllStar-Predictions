@@ -3,9 +3,6 @@ title: "NBA All-Star Predictions"
 author: "Eric Drew"
 date: "`r Sys.Date()`"
 site: bookdown::bookdown_site
-output:
-  pdf_document:
-    fig_crop: false
 ---
 
 # NBA All-Star Predictions
