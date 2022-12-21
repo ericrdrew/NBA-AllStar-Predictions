@@ -598,14 +598,15 @@ importance.columns = ['importance']
 importance.sort_values(by='importance', ascending=False, inplace=True)
 ```
 
+
 ```{python, echo=F}
 #plot importance
 sns.barplot(x='importance', y=importance.index, data=importance, order=importance.index[:10])
 plt.title('Top 10 Most Important Variables')
 plt.xlabel('Importance Score')
-plt.yticks(size=3)
-plt.xticks(size=3)
 ```
+
+
 
 Unsurprisingly, points per game was by far the most important variable to our model's predictions. Intuitively,
 seeing field goals made per game following it in second place makes sense as well, as the variables would be 
