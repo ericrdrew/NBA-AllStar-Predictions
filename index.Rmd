@@ -602,7 +602,7 @@ importance.sort_values(by='importance', ascending=False, inplace=True)
 ```{python, echo=F}
 #plot importance
 sns.barplot(x='importance', y=importance.index, data=importance, order=importance.index[:10])
-plt.title('Top 10 Most Important Variables')
+plt.title('10 Most Important Variables')
 plt.xlabel('Importance Score')
 ```
 
