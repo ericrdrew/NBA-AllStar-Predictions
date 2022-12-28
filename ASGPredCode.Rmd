@@ -464,7 +464,7 @@ final['Conference'] = np.where(np.isin(final['Tm'],west), 'West', 'East')
 final = final.sort_values(by='All-Star Probability', ascending=False)
 
 #Write out file --------------------UPDATE DATE IN FILE NAME FOR TRACKING OVER TIME----------------------------------
-final.to_csv('C:/Users/ericd/OneDrive - North Carolina State University/Desktop/NBA-AllStar-Predictions/results-12-27)
+final.to_csv('C:/Users/ericd/OneDrive - North Carolina State University/Desktop/NBA-AllStar-Predictions/results-12-27.csv')
 ```
 
 ```{python, echo=F}
