@@ -1,0 +1,480 @@
+---
+title: "ASGPredCode"
+author: "Eric Drew"
+date: "2022-12-28"
+output: html_document
+---
+
+```{r terminal, echo=F}
+# RUN ME TO GET BACK TO AN R TERMINAL
+```
+
+```{python}
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import time
+import sklearn
+import seaborn as sns
+import xgboost as xgb
+from scipy.stats import zscore
+from sklearn.preprocessing import OneHotEncoder, LabelEncoder
+from sklearn.compose import make_column_transformer
+from sklearn.model_selection import GridSearchCV, KFold, RepeatedStratifiedKFold, train_test_split, cross_val_score, RandomizedSearchCV
+from sklearn.metrics import roc_curve, auc, roc_auc_score, RocCurveDisplay, plot_confusion_matrix
+from sklearn.calibration import calibration_curve
+```
+
+```{python}
+s03 = pd.read_csv('C:/Users/ericd/OneDrive - North Carolina State University/Desktop/NBA-AllStar-Predictions/Data/season03-04.csv')
+s04 = pd.read_csv('C:/Users/ericd/OneDrive - North Carolina State University/Desktop/NBA-AllStar-Predictions/Data/season04-05.csv')
+s05 = pd.read_csv('C:/Users/ericd/OneDrive - North Carolina State University/Desktop/NBA-AllStar-Predictions/Data/season05-06.csv')
+s06 = pd.read_csv('C:/Users/ericd/OneDrive - North Carolina State University/Desktop/NBA-AllStar-Predictions/Data/season06-07.csv')
+s07 = pd.read_csv('C:/Users/ericd/OneDrive - North Carolina State University/Desktop/NBA-AllStar-Predictions/Data/season07-08.csv')
+s08 = pd.read_csv('C:/Users/ericd/OneDrive - North Carolina State University/Desktop/NBA-AllStar-Predictions/Data/season08-09.csv')
+s09 = pd.read_csv('C:/Users/ericd/OneDrive - North Carolina State University/Desktop/NBA-AllStar-Predictions/Data/season09-10.csv')
+s10 = pd.read_csv('C:/Users/ericd/OneDrive - North Carolina State University/Desktop/NBA-AllStar-Predictions/Data/season10-11.csv')
+s11 = pd.read_csv('C:/Users/ericd/OneDrive - North Carolina State University/Desktop/NBA-AllStar-Predictions/Data/season11-12.csv')
+s12 = pd.read_csv('C:/Users/ericd/OneDrive - North Carolina State University/Desktop/NBA-AllStar-Predictions/Data/season12-13.csv')
+s13 = pd.read_csv('C:/Users/ericd/OneDrive - North Carolina State University/Desktop/NBA-AllStar-Predictions/Data/season13-14.csv')
+s14 = pd.read_csv('C:/Users/ericd/OneDrive - North Carolina State University/Desktop/NBA-AllStar-Predictions/Data/season14-15.csv')
+s15 = pd.read_csv('C:/Users/ericd/OneDrive - North Carolina State University/Desktop/NBA-AllStar-Predictions/Data/season15-16.csv')
+s16 = pd.read_csv('C:/Users/ericd/OneDrive - North Carolina State University/Desktop/NBA-AllStar-Predictions/Data/season16-17.csv')
+s17 = pd.read_csv('C:/Users/ericd/OneDrive - North Carolina State University/Desktop/NBA-AllStar-Predictions/Data/season17-18.csv')
+s18 = pd.read_csv('C:/Users/ericd/OneDrive - North Carolina State University/Desktop/NBA-AllStar-Predictions/Data/season18-19.csv')
+s19 = pd.read_csv('C:/Users/ericd/OneDrive - North Carolina State University/Desktop/NBA-AllStar-Predictions/Data/season19-20.csv')
+s20 = pd.read_csv('C:/Users/ericd/OneDrive - North Carolina State University/Desktop/NBA-AllStar-Predictions/Data/season20-21.csv')
+s21 = pd.read_csv('C:/Users/ericd/OneDrive - North Carolina State University/Desktop/NBA-AllStar-Predictions/Data/season21-22.csv')
+```
+
+```{python}
+#create list of dataframes to be used in loops(TRAIN ONLY)
+dfList = [s03,s04,s05,s06,s07,s08,s09,s10,s11,s12,s13,s14,s15,s16,s17,s18,s19,s20,s21]
+```
+
+```{python}
+#cleaning function removing TOTs, keep to players >=15MPG, scale continuous variables, remove special characters on name
+def trainPrep(df):
+  df = df.drop(['Rk','Player-additional','Tm'], axis=1)
+  df = df.sort_values(['Player','G'], ascending = [True, False])
+  df = df.drop_duplicates(subset=['Player'], keep='first')
+  df = df[df['MP'] >= 15]
+  df['Age'] = zscore(df['Age'])
+  df['G'] = zscore(df['G'])
+  df['GS'] = zscore(df['GS'])
+  df['MP'] = zscore(df['MP'])
+  df['FG'] = zscore(df['FG'])
+  df['FGA'] = zscore(df['FGA'])
+  df['FG%'] = zscore(df['FG%'])
+  df['3P'] = zscore(df['3P'])
+  df['3PA'] = zscore(df['3PA'])
+  df['2P'] = zscore(df['2P'])
+  df['2PA'] = zscore(df['2PA'])
+  df['2P%'] = zscore(df['2P%'])
+  df['eFG%'] = zscore(df['eFG%'])
+  df['FT'] = zscore(df['FT'])
+  df['FTA'] = zscore(df['FTA'])
+  df['FT%'] = zscore(df['FT%'])
+  df['ORB'] = zscore(df['ORB'])
+  df['DRB'] = zscore(df['DRB'])
+  df['TRB'] = zscore(df['TRB'])
+  df['AST'] = zscore(df['AST'])
+  df['STL'] = zscore(df['STL'])
+  df['BLK'] = zscore(df['BLK'])
+  df['TOV'] = zscore(df['TOV'])
+  df['PF'] = zscore(df['PF'])
+  df['PTS'] = zscore(df['PTS'])
+  df['Player']=df['Player'].str.replace("\\W",'',regex=True)
+  return df
+```
+
+```{python}
+#Run training sets through cleaning function
+s03,s04,s05,s06,s07,s08,s09,s10,s11,s12,s13,s14,s15,s16,s17,s18,s19,s20,s21 =[trainPrep(df) for df in dfList]
+```
+
+```{python, echo=F}
+ASG03 = ['KobeBryant','KevinGarnett','TimDuncan','SteveFrancis','YaoMing','RayAllen',"ShaquilleONeal",'SamCassell',
+         'PejaStojaković','DirkNowitzki','AndreiKirilenko','BradMiller',"JermaineONeal",'AllenIverson','BenWallace',
+         'TracyMcGrady','VinceCarter','KenyonMartin','JasonKidd','JamaalMagloire','MettaWorldPeace','BaronDavis',
+         'MichaelRedd','PaulPierce']
+ASG04 = ['AllenIverson','LeBronJames',"ShaquilleONeal",'VinceCarter','GrantHill','DwyaneWade',"JermaineONeal",
+         'ZydrunasIlgauskas','PaulPierce','GilbertArenas','BenWallace','AntawnJamison','KobeBryant','TracyMcGrady',
+         'YaoMing','TimDuncan','KevinGarnett','RayAllen', 'ManuGinóbili','DirkNowitzki',"AmareStoudemire",'SteveNash',
+         'ShawnMarion', 'RashardLewis']
+ASG05 = ['DwyaneWade','LeBronJames','AllenIverson', "ShaquilleONeal",'VinceCarter','BenWallace','RasheedWallace','ChrisBosh',
+         'ChaunceyBillups','PaulPierce','RichardHamilton','GilbertArenas','SteveNash','TracyMcGrady','KobeBryant','TimDuncan',
+         'YaoMing','TonyParker','RayAllen','ShawnMarion','EltonBrand','KevinGarnett','DirkNowitzki','PauGasol',"JermaineONeal"]
+ASG06 = ['KobeBryant','TracyMcGrady','DirkNowitzki','TimDuncan','KevinGarnett','CarmeloAnthony','TonyParker','ShawnMarion',
+         'RayAllen',"AmareStoudemire",'JoshHoward','MehmetOkur','LeBronJames','DwyaneWade','ChrisBosh','GilbertArenas',
+         "ShaquilleONeal","JermaineONeal",'DwightHoward','JoeJohnson','ChaunceyBillups','VinceCarter','CaronButler','RichardHamilton',
+         'JasonKidd','CarlosBoozer','AllenIverson','YaoMing','SteveNash']
+ASG07 = ['DwightHoward','LeBronJames','JasonKidd','DwyaneWade','ChrisBosh','RayAllen','ChaunceyBillups','RichardHamilton',
+         'RasheedWallace','JoeJohnson','PaulPierce','AntawnJamison','TimDuncan','CarmeloAnthony','AllenIverson','YaoMing',
+         'KobeBryant','BrandonRoy','ChrisPaul','DirkNowitzki',"AmareStoudemire",'SteveNash','CarlosBoozer','DavidWest',
+         'CaronButler','KevinGarnett']
+ASG08 = ['KobeBryant','ChrisPaul',"AmareStoudemire",'TimDuncan','YaoMing','BrandonRoy','TonyParker','ChaunceyBillups',
+         'PauGasol','DavidWest','DirkNowitzki',"ShaquilleONeal",'DwightHoward','LeBronJames','DwyaneWade','KevinGarnett',
+         'AllenIverson','JoeJohnson','RashardLewis','PaulPierce','RayAllen','DevinHarris','MoWilliams','DannyGranger',
+         'ChrisBosh','JameerNelson']
+ASG09 = ['LeBronJames','DwyaneWade','DwightHoward','JoeJohnson','KevinGarnett','ChrisBosh','RajonRondo','GeraldWallace','DerrickRose',
+         'AlHorford','DavidLee','PaulPierce','CarmeloAnthony','DirkNowitzki','SteveNash',"AmareStoudemire",'TimDuncan',
+         'DeronWilliams','ChaunceyBillups','PauGasol','KevinDurant','ZachRandolph','ChrisKaman','JasonKidd',
+         'AllenIverson','KobeBryant','ChrisPaul','BrandonRoy']
+ASG10 = ['KevinDurant','KobeBryant','ChrisPaul','CarmeloAnthony','TimDuncan','PauGasol','ManuGinóbili','DeronWilliams',
+         'BlakeGriffin','DirkNowitzki','RussellWestbrook','KevinLove','LeBronJames','DerrickRose',"AmareStoudemire",
+         'DwightHoward','DwyaneWade','ChrisBosh','RajonRondo','JoeJohnson','RayAllen','PaulPierce','AlHorford','KevinGarnett',
+         'YaoMing']
+ASG11 = ['KevinDurant','KobeBryant','BlakeGriffin','ChrisPaul','AndrewBynum','RussellWestbrook','KevinLove','DirkNowitzki','MarcGasol',
+         'TonyParker','LaMarcusAldridge','SteveNash','DwyaneWade','LeBronJames','DwightHoward','CarmeloAnthony','DerrickRose',
+         'ChrisBosh','DeronWilliams','RajonRondo','AndreIguodala','PaulPierce','RoyHibbert','LuolDeng','JoeJohnson']
+ASG12 = ['KevinDurant','KobeBryant','BlakeGriffin','ChrisPaul','DwightHoward','JamesHarden','TonyParker','RussellWestbrook',
+         'DavidLee','ZachRandolph','LaMarcusAldridge','TimDuncan','CarmeloAnthony','LeBronJames','DwyaneWade','ChrisBosh',
+         'KevinGarnett','KyrieIrving','PaulGeorge','LuolDeng','TysonChandler','JoakimNoah','JrueHoliday','BrookLopez','RajonRondo']
+ASG13 = ['KyrieIrving','LeBronJames','PaulGeorge','CarmeloAnthony','DwyaneWade','JoakimNoah', 'JohnWall','DeMarDeRozan',
+         'PaulMillsap','RoyHibbert','ChrisBosh','JoeJohnson','KevinDurant','KevinLove','BlakeGriffin','StephenCurry',
+         'JamesHarden','ChrisPaul','DwightHoward','LaMarcusAldridge','TonyParker','AnthonyDavis','DamianLillard',
+         'DirkNowitzki','KobeBryant']
+ASG14 = ['JamesHarden','StephenCurry','MarcGasol','KlayThompson','LaMarcusAldridge','ChrisPaul','RussellWestbrook',
+         'DeMarcusCousins','DamianLillard','TimDuncan','DirkNowitzki','KevinDurant','LeBronJames','CarmeloAnthony','JohnWall',
+         'PauGasol','KyleLowry','KyrieIrving','KyleKorver','PaulMillsap','AlHorford','JeffTeague','ChrisBosh','JimmyButler',
+         'DwyaneWade','KobeBryant','AnthonyDavis','BlakeGriffin']
+ASG15 = ['StephenCurry','KobeBryant','KawhiLeonard','KevinDurant','RussellWestbrook','JamesHarden','KlayThompson',
+         'ChrisPaul','AnthonyDavis','LaMarcusAldridge','DraymondGreen','DeMarcusCousins','KyleLowry','PaulGeorge',
+         'CarmeloAnthony','LeBronJames','JohnWall','PaulMillsap','IsaiahThomas','DeMarDeRozan','AndreDrummond','PauGasol',
+         'AlHorford','ChrisBosh','JimmyButler']
+ASG16 = ['AnthonyDavis','JamesHarden','StephenCurry','KevinDurant','KawhiLeonard','MarcGasol','RussellWestbrook',
+         'KlayThompson','GordonHayward','DraymondGreen','DeAndreJordan','DeMarcusCousins','DeMarDeRozan',
+         'GiannisAntetokounmpo','KyrieIrving','LeBronJames','JimmyButler','PaulGeorge','JohnWall','KembaWalker',
+         'CarmeloAnthony','IsaiahThomas','KyleLowry','PaulMillsap','KevinLove']
+ASG17 = ['LeBronJames','KevinDurant','RussellWestbrook','KyrieIrving','AnthonyDavis','PaulGeorge','BradleyBeal',
+         'AndreDrummond','VictorOladipo','KembaWalker','GoranDragić','LaMarcusAldridge','JamesHarden','DeMarDeRozan',
+         'StephenCurry','GiannisAntetokounmpo','JoelEmbiid','KyleLowry','KlayThompson','DamianLillard','DraymondGreen',
+         'KarlAnthonyTowns','AlHorford','DeMarcusCousins','KevinLove','KristapsPorziņģis','JohnWall','JimmyButler']
+ASG18 = ['LeBronJames','JamesHarden','KevinDurant','KyrieIrving','KawhiLeonard','DamianLillard','KlayThompson',
+         'BradleyBeal','BenSimmons','KarlAnthonyTowns','LaMarcusAldridge','DwyaneWade','AnthonyDavis','StephenCurry',
+         'GiannisAntetokounmpo','PaulGeorge','JoelEmbiid','KembaWalker','KhrisMiddleton','BlakeGriffin','RussellWestbrook',
+         'NikolaJokić','KyleLowry',"DAngeloRussell",'NikolaVučević','DirkNowitzki','VictorOladipo']
+ASG19 = ['KawhiLeonard','AnthonyDavis','LeBronJames','JamesHarden','LukaDončić','BenSimmons','RussellWestbrook',
+         'ChrisPaul','DevinBooker','DomantasSabonis','JaysonTatum','NikolaJokić','GiannisAntetokounmpo','KembaWalker',
+         'JoelEmbiid','PascalSiakam','TraeYoung','KyleLowry','KhrisMiddleton','RudyGobert','DonovanMitchell','JimmyButler',
+         'BamAdebayo','BrandonIngram','DamianLillard']
+ASG20 = ['LukaDončić','StephenCurry','GiannisAntetokounmpo','NikolaJokić','LeBronJames','ChrisPaul','JaylenBrown','PaulGeorge',
+         'DamianLillard','DomantasSabonis','RudyGobert','KyrieIrving','BradleyBeal','KawhiLeonard','JaysonTatum',
+         'ZionWilliamson','JamesHarden','DonovanMitchell','ZachLaVine','NikolaVučević','JuliusRandle','MikeConley',
+         'DevinBooker','AnthonyDavis','KevinDurant','JoelEmbiid','BenSimmons']
+ASG21 = ['StephenCurry','LeBronJames','GiannisAntetokounmpo','DeMarDeRozan','NikolaJokić','LukaDončić','DariusGarland',
+         'JarrettAllen','FredVanVleet','JimmyButler','ChrisPaul','JoelEmbiid','JaysonTatum','TraeYoung','JaMorant','AndrewWiggins',
+         'DevinBooker','DejounteMurray','LaMeloBall','KhrisMiddleton','KarlAnthonyTowns','RudyGobert','ZachLaVine','KevinDurant',
+         'DraymondGreen','JamesHarden','DonovanMitchell']
+```
+
+```{python, echo=F}
+s03['AllStar'] = np.where(np.isin(s03['Player'],ASG03), 1, 0)
+s04['AllStar'] = np.where(np.isin(s04['Player'],ASG04), 1, 0)
+s05['AllStar'] = np.where(np.isin(s05['Player'],ASG05), 1, 0)
+s06['AllStar'] = np.where(np.isin(s06['Player'],ASG06), 1, 0)
+s07['AllStar'] = np.where(np.isin(s07['Player'],ASG07), 1, 0)
+s08['AllStar'] = np.where(np.isin(s08['Player'],ASG08), 1, 0)
+s09['AllStar'] = np.where(np.isin(s09['Player'],ASG09), 1, 0)
+s10['AllStar'] = np.where(np.isin(s10['Player'],ASG10), 1, 0)
+s11['AllStar'] = np.where(np.isin(s11['Player'],ASG11), 1, 0)
+s12['AllStar'] = np.where(np.isin(s12['Player'],ASG12), 1, 0)
+s13['AllStar'] = np.where(np.isin(s13['Player'],ASG13), 1, 0)
+s14['AllStar'] = np.where(np.isin(s14['Player'],ASG14), 1, 0)
+s15['AllStar'] = np.where(np.isin(s15['Player'],ASG15), 1, 0)
+s16['AllStar'] = np.where(np.isin(s16['Player'],ASG16), 1, 0)
+s17['AllStar'] = np.where(np.isin(s17['Player'],ASG17), 1, 0)
+s18['AllStar'] = np.where(np.isin(s18['Player'],ASG18), 1, 0)
+s19['AllStar'] = np.where(np.isin(s19['Player'],ASG19), 1, 0)
+s20['AllStar'] = np.where(np.isin(s20['Player'],ASG20), 1, 0)
+s21['AllStar'] = np.where(np.isin(s21['Player'],ASG21), 1, 0)
+```
+
+```{python, echo=F, results='hide'}
+#Make sure all the all stars were labeled properly
+s06.AllStar.value_counts()
+```
+
+```{python}
+#re-establish dfList with updated DFs
+dfList = [s03,s04,s05,s06,s07,s08,s09,s10,s11,s12,s13,s14,s15,s16,s17,s18,s19,s20,s21]
+#Concatenate the training seasons
+train = pd.concat(dfList)
+```
+
+```{python}
+train['AllStar'].value_counts()
+#roughly 8% of the data is AllStar, may not need to oversample
+```
+
+```{python}
+#Change numeric to binary target
+label_encoder = LabelEncoder()
+train['AllStar'] = label_encoder.fit_transform(train['AllStar'])
+```
+
+```{python}
+#Drop player col
+train = train.drop(['Player'], axis=1)
+```
+
+```{python}
+#Check which values of position are taken across training set for aggregation
+train.Pos.value_counts()
+```
+
+```{python}
+#Combine Guard/Front-Court positions
+train['Pos'] = np.where(((train['Pos'].eq('PG')) | (train['Pos'].eq('SG')) | (train['Pos'].eq('PG-SG')) |(train['Pos'].eq('SG-PG')) |
+                         (train['Pos'].eq('SG-PF'))|
+    (train['Pos'].eq('SG-PG-SF'))),'Guard','Frontcourt')
+```
+
+```{python}
+transformer = make_column_transformer(
+    (OneHotEncoder(sparse=False), ['Pos']),
+    remainder = 'passthrough'
+)
+transformed = transformer.fit_transform(train)
+train = pd.DataFrame(transformed, columns=transformer.get_feature_names_out())
+```
+
+```{python writeTrain}
+#write out training dataset
+train.to_csv('C:/Users/ericd/OneDrive - North Carolina State University/Desktop/NBA-AllStar-Predictions/train.csv')
+```
+
+```{python}
+#Test set read in
+test = pd.read_csv('C:/Users/ericd/OneDrive - North Carolina State University/Desktop/NBA-AllStar-Predictions/Data/season22-23.csv')
+```
+
+```{python}
+#Test set cleaning function
+def testPrep(df):
+    df = df.sort_values(['Player','G'], ascending = [True, False])
+    df = df.drop_duplicates(subset=['Player'], keep='first')
+    df = df[df['MP'] >= 15]
+    df = df.drop(['Rk','Tm'], axis=1)
+    df['Age'] = zscore(df['Age'])
+    df['G'] = zscore(df['G'])
+    df['GS'] = zscore(df['GS'])
+    df['MP'] = zscore(df['MP'])
+    df['FG'] = zscore(df['FG'])
+    df['FGA'] = zscore(df['FGA'])
+    df['FG%'] = zscore(df['FG%'])
+    df['3P'] = zscore(df['3P'])
+    df['3PA'] = zscore(df['3PA'])
+    df['2P'] = zscore(df['2P'])
+    df['2PA'] = zscore(df['2PA'])
+    df['2P%'] = zscore(df['2P%'])
+    df['eFG%'] = zscore(df['eFG%'])
+    df['FT'] = zscore(df['FT'])
+    df['FTA'] = zscore(df['FTA'])
+    df['FT%'] = zscore(df['FT%'])
+    df['ORB'] = zscore(df['ORB'])
+    df['DRB'] = zscore(df['DRB'])
+    df['TRB'] = zscore(df['TRB'])
+    df['AST'] = zscore(df['AST'])
+    df['STL'] = zscore(df['STL'])
+    df['BLK'] = zscore(df['BLK'])
+    df['TOV'] = zscore(df['TOV'])
+    df['PF'] = zscore(df['PF'])
+    df['PTS'] = zscore(df['PTS'])
+
+    df['Pos'] = np.where(((df['Pos'].eq('PG')) | (df['Pos'].eq('SG'))),'Guard','Frontcourt')
+
+    #one hot encoding for test
+    transformer = make_column_transformer(
+    (OneHotEncoder(sparse=False), ['Pos']),
+    remainder = 'passthrough'
+    )
+    transformed = transformer.fit_transform(df)
+    df = pd.DataFrame(transformed, columns=transformer.get_feature_names_out())
+    return df
+```
+
+```{python}
+#Send test set through cleaning function
+test = testPrep(test)
+```
+
+```{python, echo=F}
+playernames = test['remainder__Player'].tolist()
+test = test.drop(['remainder__Player'],axis=1)
+```
+
+```{python, echo=F}
+s = test.select_dtypes(include='object').columns
+test[s] = test[s].astype("float")
+```
+
+```{python writeTest}
+#write out test set
+test.to_csv('C:/Users/ericd/OneDrive - North Carolina State University/Desktop/NBA-AllStar-Predictions/test.csv')
+
+```
+ 
+```{python, echo=F}
+plt.scatter(x=train['remainder__MP'], y=train['remainder__PTS'])
+plt.title('Scatterplot of Minutes/Game vs. Points/Game')
+plt.xlabel('Minutes/Game (Scaled)')
+plt.ylabel('Points/Game (Scaled)')
+```
+
+```{python}
+sns.boxplot(x = train['remainder__AllStar'],
+            y = train['remainder__PTS'])
+plt.title('Boxplot of Points/Game by All-Star Status')
+plt.xlabel('All-Star Status')
+plt.ylabel('Points/Game (Scaled)')
+```
+
+```{python, echo=F}
+sns.boxplot(x = train['remainder__AllStar'],
+            y = train['remainder__FG%'])
+plt.title('Boxplot of Field Goal % by All-Star Status')
+plt.xlabel('All-Star Status')
+plt.ylabel('FG % (Scaled)')
+```
+
+```{python, echo=F}
+corr_matrix = train.corr()
+sns.heatmap(corr_matrix, annot=False)
+plt.title('Correlation Matrix')
+```
+
+```{python}
+#Create X and Y object for data split function
+X = train.drop(['remainder__AllStar'],axis=1)
+Y = train['remainder__AllStar'].values
+```
+
+```{python}
+#data split
+X_train, X_valid, Y_train, Y_valid = train_test_split(X, Y, test_size = .2, stratify=Y, random_state=20)
+```
+
+```{python}
+#Establish XGB regressor
+xgb_model = xgb.XGBRegressor(objective="binary:logistic", random_state=0)
+```
+
+```{python}
+#Set CV params
+cv = RepeatedStratifiedKFold(n_splits = 10, n_repeats = 3, random_state=0)
+```
+
+```{python}
+#Establish tuning parameters
+params = {
+    "max_depth":[10,15,20],
+    "n_estimators":[200,400,600],
+    "min_samples_split":[5,10]
+}
+```
+
+```{python}
+#Set gridsearch object. Use ROC as our CV measure
+clf = GridSearchCV(xgb_model, params, cv=cv, scoring='roc_auc')
+```
+
+```{python, results='hide'}
+#Fit model
+tick = time.time()
+clf.fit(X_train,Y_train)
+tock = time.time()
+
+print("Fit complete")
+print(f"Time Taken: {round((tock-tick)/60,2)} minutes")
+```
+ 
+```{python}
+#Take best model from grid search
+final_model = clf.best_estimator_
+```
+
+```{python}
+#View parameters of the selected model
+final_model.get_params()
+```
+
+```{python, echo=F}
+#Store predictions on validation set
+Y_pred = final_model.predict(X_valid)
+```
+
+```{python, echo=F, results='hide'}
+#Find metrics via roc curve function
+fpr, tpr, thresh = roc_curve(Y_valid, Y_pred)
+```
+
+```{python, echo=F, results='hide'}
+#Numerically view area under ROC score
+auc(fpr,tpr)
+```
+
+```{python, echo=F}
+#Plot ROC Curve
+plt.figure(figsize=(8,4))
+plt.plot(fpr,tpr, lw=2, color='red')
+plt.xlim([0,1])
+plt.ylim([0,1])
+plt.xlabel("FPR")
+plt.ylabel("TPR")
+plt.title("ROC Curve for XGBoost", size=14)
+plt.text(s=f'{round(auc(fpr,tpr),2)}', x=.5, y=.5)
+plt.fill_between(fpr,tpr, alpha=0.2)
+```
+
+```{python, echo=F}
+#Pull variable importance from the model output, rank by most important
+importance = pd.DataFrame(final_model.feature_importances_, index=list(X_train.columns))
+importance.columns = ['importance']
+importance.sort_values(by='importance', ascending=False, inplace=True)
+```
+
+```{python, echo=F}
+#plot importance
+sns.barplot(x='importance', y=importance.index, data=importance, order=importance.index[:10])
+plt.title('10 Most Important Variables')
+plt.xlabel('Importance Score')
+```
+
+```{python, echo=F}
+#Store test predictions
+Y_pred_test = final_model.predict(test)
+resultsList = {'Player':playernames, 'All-Star Probability':Y_pred_test}
+results = pd.DataFrame(resultsList)
+
+#merge probabilities on to original '22-'23 dataset with 
+final = pd.read_csv('C:/Users/ericd/OneDrive - North Carolina State University/Desktop/NBA-AllStar-Predictions/Data/season22-23.csv')
+
+final = final.merge(results, on='Player',how='left')
+
+#Position grouping
+final['Pos'] = np.where((final['Pos'].eq('PG')) | (final['Pos'].eq('SG')),'Guard','Frontcourt')
+
+#Conference Grouping
+west = ['MEM','NOP','DEN','PHO','POR','SAC','UTA','LAC','DAL','GSW','MIN','LAL','OKC','SAS','HOU']
+final['Conference'] = np.where(np.isin(final['Tm'],west), 'West', 'East')
+
+#Sort by descending ASG probability
+final = final.sort_values(by='All-Star Probability', ascending=False)
+
+#Write out file --------------------UPDATE DATE IN FILE NAME FOR TRACKING OVER TIME----------------------------------
+final.to_csv('C:/Users/ericd/OneDrive - North Carolina State University/Desktop/NBA-AllStar-Predictions/results-12-27)
+```
+
+```{python, echo=F}
+#East All-Stars
+final[final['Conference'] == 'East'].head(15)[['Player','Pos','All-Star Probability']]
+```
+
+```{python, echo=F}
+#East All-Stars
+final[final['Conference'] == 'West'].head(15)[['Player','Pos','All-Star Probability']]
+```
+
+
