@@ -313,7 +313,6 @@ test[s] = test[s].astype("float")
 ```{python writeTest}
 #write out test set
 test.to_csv('C:/Users/ericd/OneDrive - North Carolina State University/Desktop/NBA-AllStar-Predictions/test.csv')
-
 ```
  
 ```{python, echo=F}
